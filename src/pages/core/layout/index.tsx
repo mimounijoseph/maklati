@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import Header from "../header";
 import Footer from "../footer";
+import { ThemeProvider } from "@/components/theme-provider";
 
 type LayoutProps = {
   children: ReactNode;
@@ -9,9 +10,16 @@ type LayoutProps = {
 export default function Layout({ children }: LayoutProps) {
   return (
     <>
-        <Header/>
+              <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+                    <Header/>
       <main>{children}</main>
         <Footer />
+          </ThemeProvider>
     </>
   );
 }
