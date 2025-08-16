@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@plugin "flowbite-react/plugin/tailwindcss";
+@source "../../.flowbite-react/class-list.json";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -86,7 +88,7 @@
 }
 
 body {
-  background: var(--background);
+  background: #FFC900;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -123,6 +125,13 @@ body {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+ul{
+    font-family: "Sansita Swashed", cursive;
+  font-weight: 600;
+  font-style: normal;
+  font-size: large
 }
 
 @layer base {
