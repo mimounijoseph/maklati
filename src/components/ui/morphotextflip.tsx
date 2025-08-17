@@ -94,8 +94,8 @@ export function MorphoTextFlip({
       }}
       className={cn(
         "relative inline-block overflow-hidden rounded-2xl px-6 pt-2 pb-3",
-        "backdrop-blur-sm border border-gray-200 shadow-xl",
-        "bg-white/70 dark:bg-slate-800/70",
+        "backdrop-blur-sm  shadow-xl",
+        "bg-white/70",
         "dark:border-slate-700",
         className
       )}
@@ -127,7 +127,7 @@ export function MorphoTextFlip({
                   : "easeInOut",
             }}
             className={cn(
-              "text-4xl font-bold text-rose-600 dark:text-rose-400 md:text-7xl  whitespace-nowrap",
+              "text-4xl font-bold text-amber-600  md:text-7xl  whitespace-nowrap",
               textClassName
             )}
             ref={textRef}

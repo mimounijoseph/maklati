@@ -1,8 +1,22 @@
-import LustreTextComponent from '@/components/luster-text'
 import ThemeSwitchIcon from '@/components/theme-switch-icon'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useToast } from "@/components/ui/toast";
 
 function Header() {
+     const { toast } = useToast();
+       const showToast = () => {
+    toast({
+      title: "Success!",
+      description: "Your action was completed successfully.",
+      variant: "success",
+      duration:2000
+    });
+  };
+
+useEffect(()=>{
+    // showToast()
+},[])
+
   return (
     <div>
       
@@ -16,8 +30,8 @@ function Header() {
         </h1>
         {/* </a> */}
         <div className="flex items-center md:order-2 space-x-1 md:space-x-2 rtl:space-x-reverse">
-            <a href="#" className="text-white hover:bg-amber-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800">Login</a>
-            <a href="#" className="text-white hover:bg-amber-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Sign up</a>
+            <a href="#" className="text-white hover:bg-amber-600 focus:ring-4 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 focus:outline-none">Login</a>
+            <a href="#" className="text-white hover:bg-amber-600 focus:ring-4  font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5  focus:outline-none ">Sign up</a>
       {/* <ThemeSwitchIcon/> */}
             
             <button data-collapse-toggle="mega-menu" type="button" className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="mega-menu" aria-expanded="false">

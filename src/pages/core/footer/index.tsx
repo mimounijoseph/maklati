@@ -10,14 +10,13 @@ function Footer() {
           <div>
             <h1 className="text-2xl font-bold" style={{fontFamily:"Sacramento"}}>maklati</h1>
             <p className="mt-3 text-sm text-gray-200">
-              Votre snack préféré en ligne 🍔🍟.  
-              Commandez facilement et savourez où que vous soyez.
+              Your favorite snack online 🍔🍟. Order easily and enjoy wherever you are.
             </p>
           </div>
 
           {/* Liens rapides */}
           <div>
-            <h2 className="text-lg font-semibold mb-3">Liens rapides</h2>
+            <h2 className="text-lg font-semibold mb-3">Quick Links</h2>
             <ul className="space-y-2">
               <li>
                 <a href="/" className="hover:text-yellow-300">Home</a>
@@ -36,7 +35,7 @@ function Footer() {
 
           {/* Réseaux sociaux */}
           <div>
-            <h2 className="text-lg font-semibold mb-3">Suivez-nous</h2>
+            <h2 className="text-lg font-semibold mb-3">Follow Us</h2>
             <div className="flex space-x-4">
               <a href="#" className="hover:text-yellow-300">Facebook</a>
               <a href="#" className="hover:text-yellow-300">Instagram</a>
@@ -46,9 +45,17 @@ function Footer() {
         </div>
 
         {/* Ligne en bas */}
-        <div className="border-t border-red-500 py-4 text-center text-sm text-gray-200">
-          © {new Date().getFullYear()} Maklati. Tous droits réservés.
-        </div>
+<div className="border-t border-red-500 py-4 text-center text-sm text-gray-200">
+  <p>
+    © {new Date().getFullYear()} Maklati. Tous droits réservés.
+  </p>
+  <div className="mt-2 space-x-4">
+    <a href="/conditions" className="hover:underline text-gray-200">Conditions d'utilisation</a>
+    <a href="/confidentialite" className="hover:underline text-gray-200">Politique de confidentialité</a>
+    <a href="/mentions-legales" className="hover:underline text-gray-200">Mentions légales</a>
+  </div>
+</div>
+
       </div>
     </footer>
   )
