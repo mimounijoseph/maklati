@@ -81,7 +81,7 @@ export default function ProfileCard({
 
   return (
     <div className="flex items-center justify-center">
-      <div className="relative w-[17rem] h-[21.1875rem] rounded-[15px] overflow-hidden shadow-lg bg-neutral-50 dark:bg-black">
+      <div className="relative w-[17rem] h-[21.1875rem] rounded-[15px] overflow-hidden shadow-lg bg-neutral-50 text-black">
         <motion.div
           initial={{ width: "100%", height: "100%" }}
           animate={{
@@ -146,7 +146,7 @@ export default function ProfileCard({
                 <p className="text-sm tracking-wider">{position}</p>
               </div>
 
-              <div className="absolute top-[4rem] left-[8rem]">
+              {/* <div className="absolute top-[4rem] left-[8rem]">
                 <h3 className="text-lg font-semibold mb-2">Skills</h3>
                 <div className="flex flex-wrap gap-2">
                   {skills.map((skill, index) => (
@@ -165,7 +165,7 @@ export default function ProfileCard({
                     </div>
                   ))}
                 </div>
-              </div>
+              </div> */}
 
               <div className="absolute top-[13rem] left-0 px-4">
                 <p className="text-sm">{bio}</p>

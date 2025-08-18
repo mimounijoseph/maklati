@@ -74,11 +74,11 @@ function Menu() {
           key={index}
       img={snack.image}
       name={snack.name}
-      bio="snack dsc"
+      bio="menu variable avec plein de categori là'dans , pizza, tacos, boissons et beaucoup plus"
       skills={[]}
       githubUrl={undefined}
       twitterUrl={undefined}
-      position="Senior Software Engineer"
+      position="Berkane centre ville"
     />
         </div>
       ))}
