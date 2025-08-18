@@ -3,6 +3,20 @@ import withFlowbiteReact from "flowbite-react/plugin/nextjs";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'github.com',
+        pathname: '/**',
+      },
+            {
+        protocol: 'https',
+        hostname: 'github.githubassets.com',
+        pathname: '/**',
+      },
+    ],
+  },
   reactStrictMode: true,
 };
 

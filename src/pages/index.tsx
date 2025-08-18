@@ -30,7 +30,7 @@ export default function Home() {
         className=" text-white w-fit cursor-pointer mt-2"
         variant="default"
         inputSize="default"
-        glow={true}
+        glow={false}
         rounded="custom"
         hideAnimations={false}
         uppercase={true}

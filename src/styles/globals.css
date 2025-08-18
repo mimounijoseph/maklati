@@ -90,7 +90,7 @@
 body {
   background: #FFC900;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:"Sansita Swashed";
 }
 
 .dark {
@@ -132,6 +132,11 @@ ul{
   font-weight: 600;
   font-style: normal;
   font-size: large
+}
+
+.main-layout{
+  height: 100%;
+  min-height: calc(100vh - 445px);
 }
 
 @layer base {
