@@ -22,11 +22,14 @@ export function MorphoTextFlip({
   animationDuration = 700,
   animationType = "slideUp",
 }: MorphoTextFlipProps) {
+
+
   const id = useId();
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [width, setWidth] = useState("auto");
   const textRef = React.useRef<HTMLDivElement>(null);
   const measureRef = React.useRef<HTMLDivElement>(null);
+
 
   const updateWidthForWord = () => {
     if (measureRef.current) {

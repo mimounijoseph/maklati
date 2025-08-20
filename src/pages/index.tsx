@@ -16,16 +16,17 @@ const geistMono = Geist_Mono({
 
 export default function Home() {
   return (
-      // <Card/>
       <>
             <section className="p-3 flex flex-col md:flex-row justify-center gap-2 align-middle">
         <div>
-      <h1 className="text-5xl mb-2 pt-[100px]" style={{fontFamily:"Sansita Swashed"}}>Easily Share Menus, <br /> Instantly Delight Customers</h1>
+      <h1 className="text-5xl mb-2 pt-[100px]" style={{fontFamily:"Sansita Swashed"}}>Easily Share Menus,
+          <br /> Instantly Delight Customers
+      </h1>
       <MorphoTextFlip
-  words={["Easy", "Fast", "Delicious", "Seamless", "Interactive", "Modern", "Convenient"]}
-  textClassName="text-4xl md:text-7xl  font-bold mt-1"
-  animationType="flipY"
-/>
+          words={["Easy", "Fast", "Delicious", "Seamless", "Interactive", "Modern", "Convenient"]}
+          textClassName="text-4xl md:text-7xl  font-bold mt-1"
+          animationType="flipY"
+        />
 <InteractiveInput
         className=" text-white w-fit cursor-pointer mt-2"
         variant="default"
@@ -44,12 +45,8 @@ export default function Home() {
        />
 
         </div>
-<img src="hero_img.png" alt="burger" width="500px" />
-
-
+        <img src="hero_img.png" alt="burger" width="500px" />
       </section>
-
       </>
-
   );
 }

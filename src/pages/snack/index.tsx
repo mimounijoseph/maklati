@@ -59,7 +59,6 @@ function Menu() {
     <div className='pt-10'>
       <h1 className='text-center text-4xl mb-4'>Snacks</h1>
       <div className='w-[30%] m-auto'>
-
             <input
         type="text"
         placeholder={"search by name"}
@@ -69,7 +68,8 @@ function Menu() {
       />
       </div>
       <div className='flex gap-2 md:w-[70%] m-auto p-3'>
-      {filteredData.map((snack, index) => (        <div className='cursor-pointer'>
+      {filteredData.map((snack, index) => (
+          <div className='cursor-pointer'>
           <CenteredImageCard
           key={index}
       img={snack.image}
