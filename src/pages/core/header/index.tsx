@@ -67,12 +67,12 @@ function showToast(title: string, message: string, variant: "success" | "default
                 >
                   Login
                 </a>
-                <a
+                {/* <a
                   href="/auth/register"
                   className="text-white hover:bg-amber-600 focus:ring-4  font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5  focus:outline-none "
                 >
                   Sign up
-                </a>
+                </a> */}
               </>
             )}
 
