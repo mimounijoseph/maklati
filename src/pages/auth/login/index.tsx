@@ -30,6 +30,7 @@ export default function Login() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       setUser(result.user);
+      localStorage.setItem("uid", result.user.uid);
       setError("");
       router.push(typeof redirect === 'string' ? redirect : '/');
     } catch (err: any) {
