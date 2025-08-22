@@ -1,8 +1,11 @@
 import Card from "@/components/card";
 import React, { useState } from "react";
+import { AnimatedButton } from "@/components/ui/animated-button";
 
-function index() {
+import { useRouter } from "next/router";
 
+function Products() {
+  const router = useRouter();
     const categories = ["Piza", "Tacos", "Drinks", "Desserts"];
 
     const [activeCategory, setActiveCategory] = useState("All");
@@ -90,7 +93,7 @@ function index() {
               {/*))}*/}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
+          <div className="flex gap-4 justify-center items-center flex-wrap">
               <Card/>
               <Card/>
               <Card/>
@@ -98,9 +101,28 @@ function index() {
               <Card/>
               <Card/>
           </div>
+          <AnimatedButton
+        className="bg-green-500 text-white fixed bottom-5 left-[30%] md:left-[40%] xl:left-[45%] w-[200px]"
+        variant="default"
+        size="default"
+        glow={true}
+        textEffect="normal"
+        uppercase={true}
+        rounded="custom"
+        asChild={false}
+        hideAnimations={false}
+        shimmerColor="#39FF14"
+        shimmerSize="0.15em"
+        shimmerDuration="3s"
+        borderRadius="100px"
+        background="rgba(0, 0, 0, 1)"
+        onClick={()=>router.push('/client/order')}
+      >
+        Order now
+      </AnimatedButton>
       </div>
   );
 }
 
-export default index;
+export default Products;
 

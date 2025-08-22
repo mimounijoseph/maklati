@@ -7,7 +7,7 @@ export const Stepper = ({ step }: { step: number }) => {
         <div key={index} className="flex flex-col items-center flex-1">
           <div
             className={`w-8 h-8 flex items-center justify-center rounded-full ${
-              step === index + 1 ? "bg-blue-600 text-white" : "bg-gray-300"
+              step === index + 1 ? "bg-amber-600 text-white" : "bg-white text-black"
             }`}
           >
             {index + 1}
