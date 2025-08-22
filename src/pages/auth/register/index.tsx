@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Card } from "flowbite-react";
 import { TextInput, Button } from "flowbite-react";
 import { auth, googleProvider } from "../../../config/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../../config/firebase";
 import { createUserWithEmailAndPassword, signInWithPopup, User } from "firebase/auth";
 import { useRouter } from "next/router";
 
@@ -18,8 +20,18 @@ export default function Register() {
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       setUser(result.user);
+      const user = result.user;
+      console.log(result.user)
+      
+ 
+  await setDoc(doc(db, "users", user.uid), {
+    email: user.email,
+    createdAt: new Date(),
+    role: "user",
+  });
+
       setError("");
-      router.push("/dashboard"); // redirect after register
+      // router.push("/dashboard"); // redirect after register
     } catch (err: any) {
       setError(err.message);
     }
@@ -29,9 +41,16 @@ export default function Register() {
   const handleGoogleRegister = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
       setUser(result.user);
+       console.log(result.user)
+         await setDoc(doc(db, "users", user.uid), {
+    email: user.email,
+    createdAt: new Date(),
+    role: "user",
+  });
       setError("");
-      router.push("/dashboard"); // redirect after Google login
+      // router.push("/dashboard"); // redirect after Google login
     } catch (err: any) {
       setError(err.message);
     }

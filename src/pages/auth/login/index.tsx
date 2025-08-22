@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Card } from "flowbite-react";
 import { TextInput, Button } from "flowbite-react";
 import { auth, googleProvider } from "../../../config/firebase";
+import { doc, setDoc, getDoc  } from "firebase/firestore";
+import { db } from "../../../config/firebase";
 import { signInWithEmailAndPassword, signInWithPopup, User } from "firebase/auth";
 import { useRouter } from "next/router";
 
@@ -19,23 +21,47 @@ export default function Login() {
       const result = await signInWithEmailAndPassword(auth, email, password);
       setUser(result.user);
       setError("");
-      router.push("/dashboard"); // redirect after login
+      // router.push("/dashboard"); // redirect after login
     } catch (err: any) {
       setError(err.message);
     }
   };
 
   // Google login
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      setUser(result.user);
-      setError("");
-      router.push("/dashboard"); // redirect after Google login
-    } catch (err: any) {
-      setError(err.message);
+const handleGoogleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    setUser(user);
+    console.log("Signed in:", user);
+
+    // 🔗 Firestore reference
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    console.log(userSnap)
+
+    if (userSnap.exists()) {
+      // ✅ User exists, get role
+      const userData = userSnap.data();
+      console.log("User role:", userData);
+    } else {
+      // ❌ First time login → create Firestore user doc
+      await setDoc(userRef, {
+        email: user.email,
+        createdAt: new Date(),
+        role: "user", // default role
+      });
+
+      console.log("New user created with role: user");
     }
-  };
+
+    setError("");
+    // router.push("/dashboard"); // redirect after Google login
+  } catch (err: any) {
+    setError(err.message);
+  }
+};
+
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
