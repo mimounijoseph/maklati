@@ -15,8 +15,8 @@ const OrderPage = () => {
 
   return (
     <ProtectedPage>
-      <div className="max-w-3xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Passer une commande</h1>
+      <div className="">
+        <h1 className="text-2xl font-bold mt-32 text-center"></h1>
 
         <Stepper step={step} />
 
