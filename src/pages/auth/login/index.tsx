@@ -13,6 +13,7 @@ export default function Login() {
   const [error, setError] = useState<string>("");
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+  const { redirect } = router.query;
 
   // Email/password login
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -21,13 +22,13 @@ export default function Login() {
       const result = await signInWithEmailAndPassword(auth, email, password);
       setUser(result.user);
       setError("");
-      // router.push("/dashboard"); // redirect after login
     } catch (err: any) {
       setError(err.message);
     }
   };
 
   // Google login
+<<<<<<< HEAD
 const handleGoogleLogin = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -53,6 +54,17 @@ const handleGoogleLogin = async () => {
       });
 
       console.log("New user created with role: user");
+=======
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      setUser(result.user);
+      localStorage.setItem("uid", result.user.uid);
+      setError("");
+      router.push(typeof redirect === 'string' ? redirect : '/');
+    } catch (err: any) {
+      setError(err.message);
+>>>>>>> c2986e16df7ab365401518e8f2c721fefc2be0c1
     }
 
     setError("");

@@ -13,12 +13,6 @@ function Menu() {
     { name: "snack 4", image: "/snack4.png" },
   ]);
   const [fetchUrl, setFetchUrl] = useState("");
-  // const snacks: Snack[] = [
-  //   { name: 'snack 1', image:"/snack1.png"},
-  //   { name: 'snack 2', image: "/snack2.jpg" },
-  //   { name: 'snack 3', image: "/snack3.avif" },
-  //   { name: 'snack 4', image: "/snack4.png" },
-  // ];
 
   // Fetch depuis une API si URL présente
   useEffect(() => {
@@ -56,7 +50,7 @@ function Menu() {
   return (
     <div className="pt-10">
       <h1 className="text-center text-4xl mb-4">Snacks</h1>
-      <div className="w-[30%] m-auto flex gap-1 justify-center items-center">
+      <div className="w-[30%] m-auto flex gap-1  justify-center items-center">
         <input
           type="text"
           placeholder={"search by name"}
@@ -68,7 +62,7 @@ function Menu() {
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
             </svg>
       </div>
-      <div className="flex gap-2 md:w-[70%] m-auto p-3">
+      <div className="flex gap-2 md:w-[80%] flex-wrap justify-center  m-auto p-3">
         {filteredData.map((snack, index) => (
           <div className="cursor-pointer">
             <CenteredImageCard

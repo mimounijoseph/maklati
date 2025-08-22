@@ -11,6 +11,7 @@ import {
   useAnimation,
   AnimatePresence,
 } from "framer-motion";
+import { useRouter } from "next/router";
 
 interface Skill {
   name: string;
@@ -42,9 +43,8 @@ export default function ProfileCard({
   const dragX = useMotionValue(0);
   const dragThreshold = 50;
   const isAnimating = useRef<boolean>(false);
-
   const arrowRotation = useTransform(dragX, [0, dragThreshold], [-180, 145]);
-
+const router = useRouter();
   const handleDragEnd = () => {
     if (dragX.get() > dragThreshold && !isRevealed && !isAnimating.current) {
       isAnimating.current = true;
@@ -100,7 +100,7 @@ export default function ProfileCard({
             layout="fill"
             objectFit="cover"
             onClick={(e) => {
-              alert("open menu");
+              router.push('/snack/1')
             }}
           />
           <motion.div
