@@ -25,13 +25,13 @@ useEffect(()=>{
     <div className="flex flex-wrap items-center justify-between max-w-screen-xl mx-auto p-4">
         {/* <a href="https://flowbite.com" className="flex items-center space-x-3 rtl:space-x-reverse"> */}
             {/* <img src="logo.png" width="140px" alt="maklati Logo" /> */}
-                    <h1 className="text-3xl font-bold" style={{ color: "#FF9B00", fontFamily: "Sacramento" }}>
+                    <a href='/' className="text-3xl font-bold" style={{ color: "#FF9B00", fontFamily: "Sacramento" }}>
           maklati
-        </h1>
+        </a>
         {/* </a> */}
         <div className="flex items-center md:order-2 space-x-1 md:space-x-2 rtl:space-x-reverse">
-            <a href="#" className="text-white hover:bg-amber-600 focus:ring-4 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 focus:outline-none">Login</a>
-            <a href="#" className="text-white hover:bg-amber-600 focus:ring-4  font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5  focus:outline-none ">Sign up</a>
+            <a href="/auth/login" className="text-white hover:bg-amber-600 focus:ring-4 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 focus:outline-none">Login</a>
+            <a href="/auth/register" className="text-white hover:bg-amber-600 focus:ring-4  font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5  focus:outline-none ">Sign up</a>
       {/* <ThemeSwitchIcon/> */}
             
             <button data-collapse-toggle="mega-menu" type="button" className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="mega-menu" aria-expanded="false">

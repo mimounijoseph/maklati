@@ -94,9 +94,15 @@ export default function ProfileCard({
           transition={{ duration: 0.4, ease: "easeInOut" }}
           className="absolute overflow-hidden"
         >
-          <Image src={img} alt={name} layout="fill" objectFit="cover" onClick={(e)=>{
-                  alert('open menu')
-                }}/>
+          <Image
+            src={img}
+            alt={name}
+            layout="fill"
+            objectFit="cover"
+            onClick={(e) => {
+              alert("open menu");
+            }}
+          />
           <motion.div
             className="absolute top-2 right-2 w-[1.6875rem] h-[1.8125rem] flex items-center justify-center bg-white rounded shadow cursor-grab active:cursor-grabbing z-10"
             drag="x"
