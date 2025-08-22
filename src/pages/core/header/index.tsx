@@ -4,23 +4,24 @@ import { useToast } from "@/components/ui/toast";
 import { useAuth } from "../../../context/useContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../config/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+
 
 function Header() {
   const { toast } = useToast();
   const { user, loading } = useAuth();
 
-  const showToast = () => {
-    toast({
-      title: "Success!",
-      description: "Your action was completed successfully.",
-      variant: "success",
-      duration: 2000,
-    });
-  };
+function showToast(title: string, message: string, variant: "success" | "default" | "destructive" | "warning" | "info" | undefined) {
+        toast({
+            title: title,
+            description: message,
+            variant: variant,
+            duration: 2000,
+        });
+    }
 
   const logout = async () => {
     await signOut(auth);
+    showToast("success !","You're logged out","success")
   };
 
   useEffect(() => {}, []);
@@ -227,3 +228,4 @@ function Header() {
 }
 
 export default Header;
+
