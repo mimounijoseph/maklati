@@ -11,6 +11,7 @@ export default function Login() {
   const [error, setError] = useState<string>("");
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+  const { redirect } = router.query;
 
   // Email/password login
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -19,7 +20,6 @@ export default function Login() {
       const result = await signInWithEmailAndPassword(auth, email, password);
       setUser(result.user);
       setError("");
-      router.push("/dashboard"); // redirect after login
     } catch (err: any) {
       setError(err.message);
     }
@@ -31,7 +31,7 @@ export default function Login() {
       const result = await signInWithPopup(auth, googleProvider);
       setUser(result.user);
       setError("");
-      router.push("/dashboard"); // redirect after Google login
+      router.push(typeof redirect === 'string' ? redirect : '/');
     } catch (err: any) {
       setError(err.message);
     }
