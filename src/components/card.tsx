@@ -1,6 +1,6 @@
 // Card.tsx
 import React from 'react'
-import CheckboxDropdown from './checkbox-dropdown'
+
 import {SpotlightCard} from "@/components/ui/spotlightcard";
 
 function Card() {
@@ -19,7 +19,7 @@ function Card() {
 
         {/* anchor for the dropdown absolute positioning */}
         <div className="relative !overflow-visible">
-          <CheckboxDropdown />
+          
         </div>
       </div>
     </SpotlightCard>
