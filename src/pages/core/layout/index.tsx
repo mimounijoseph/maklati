@@ -20,7 +20,7 @@ export default function Layout({ children }: LayoutProps) {
             disableTransitionOnChange
             
           >
-                    <Header/>
+       <Header/>
       <main className='main-layout'>{children}</main>
         <Footer />
           </ThemeProvider>

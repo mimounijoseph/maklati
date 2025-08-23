@@ -1,4 +1,5 @@
 module.exports = { 
+  
   darkMode:"false",
       content: [
     "./pages/**/*.{js,ts,jsx,tsx}", 
@@ -34,16 +35,19 @@ module.exports = {
        }, 
      }, 
     }, 
-    plugins: [
-      require('flowbite/plugin'),
-      function ({ addBase }: any) {
-      addBase({
-        ".toast-base": {
-          "touch-action": "none",
-          "user-select": "none",
-          "-webkit-user-select": "none",
-        },
-      });
-    },
-    ], 
+   plugins: [
+  require("tailwind-scrollbar"),
+  require("flowbite/plugin"),
+  require("tailwind-scrollbar-hide"),
+  function ({ addBase }: any) {
+    addBase({
+      ".toast-base": {
+        "touch-action": "none",
+        "user-select": "none",
+        "-webkit-user-select": "none",
+      },
+    });
+  },
+],
+    
  };

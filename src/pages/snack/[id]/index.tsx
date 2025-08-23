@@ -12,7 +12,7 @@ function Products() {
 
 
   return (
-      <div className="min-h-screen text-white p-6">
+      <div className="min-h-screen text-white p-6 w-screen m-auto">
 
           <header className="text-center mb-10">
               <h1 className="text-5xl text-black
@@ -22,9 +22,9 @@ function Products() {
 
 
           <div className="flex justify-center gap-3 mb-12">
-              <div className="border-b border-gray-200 dark:border-gray-700">
-                  <ul className="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500  dark:text-black">
-                      <li className="me-2">
+              <div className="border-b border-gray-200 dark:border-gray-700 mx-8 ">
+                  <ul className="px-8 w-96 sm:w-screen flex  text-sm font-medium text-center text-gray-500  dark:text-black overflow-x-auto justify-center scrollbar-hide">
+                      <li className="me-2 ml-14">
                           <a href="#"
                              className="inline-flex items-center justify-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group">
                               <svg
@@ -93,7 +93,8 @@ function Products() {
               {/*))}*/}
           </div>
 
-          <div className="flex gap-4 justify-center items-center flex-wrap">
+          <div className="flex gap-4 justify-center items-center flex-wrap relative">
+
               <Card/>
               <Card/>
               <Card/>
