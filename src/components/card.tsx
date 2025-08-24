@@ -42,7 +42,7 @@ function Card({
 
   return (
     <SpotlightCard
-      className="w-80 h-[420px] rounded-2xl bg-white/70 backdrop-blur-md
+      className="w-80 h-[500px] rounded-2xl bg-white/70 backdrop-blur-md
                  ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(17,24,39,0.12)]
                  hover:shadow-[0_16px_40px_rgba(17,24,39,0.15)] transition-shadow"
       spotlightColor="34, 211, 238"
