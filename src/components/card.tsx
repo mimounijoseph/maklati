@@ -39,7 +39,7 @@ function Card({
        className={`w-80 rounded-2xl bg-white/70 backdrop-blur-md
               ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(17,24,39,0.12)]
               hover:shadow-[0_16px_40px_rgba(17,24,39,0.15)] transition-shadow
-              ${isOrderForm ? "h-[500px]" : "h-[400px]"}`}
+              ${isOrderForm ? "h-[520px]" : "h-[400px]"}`}
   spotlightColor="34, 211, 238"
 >
       <div className="w-full h-full flex flex-col p-4">
