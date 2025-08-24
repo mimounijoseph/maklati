@@ -17,6 +17,7 @@ type ProductSelectionProps = {
   next: () => void;
 };
 export const ProductSelection = ({ next }: ProductSelectionProps) => {
+
   const [products, setProducts] = useState([
     {
       id: 1,
@@ -112,7 +113,7 @@ const {selectedProducts} = useAuth();
 
   return (
     <div>
-      <div className="min-h-screen text-white p-6">
+      <div className="text-white p-6">
         <header className="text-center mb-10">
           <h1
             className="text-5xl text-red-500
@@ -121,7 +122,6 @@ const {selectedProducts} = useAuth();
             Menu
           </h1>
         </header>
-
         <div className="flex justify-center gap-3 mb-12">
           <div className="">
             <ul className="flex sm:w-[100%] md:w-fit sm:overflow-auto -mb-px text-sm font-medium text-center text-gray-500  dark:text-black">
@@ -237,7 +237,7 @@ const {selectedProducts} = useAuth();
             </ul>
           </div>
         </div>
-
+    </div>
         <div className="flex gap-4 justify-center items-center flex-wrap">
           {filteredProducts.map((product, index) => (
             <Card key={product.id} isOrderForm={true} product={product} />
@@ -251,6 +251,5 @@ const {selectedProducts} = useAuth();
           Valider les produits
         </button>
       </div>
-    </div>
   );
 };

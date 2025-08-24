@@ -23,6 +23,7 @@ const OrderPage = () => {
         {step === 1 && (
           <ProductSelection
             next={next}
+            
           />
         )}
         {step === 2 && (

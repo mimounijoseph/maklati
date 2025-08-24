@@ -100,7 +100,6 @@ useEffect(()=>{
       className="w-80 h-96 bg-white/70"
       spotlightColor="34, 211, 238"
     >
-      {/* <span className="text-3xl absolute top-1 right-1 z-50">🍽️</span> */}
       <div className="w-full h-full flex flex-col items-center justify-start text-center p-4">
         <img
           src="/snack1.png"
@@ -111,9 +110,6 @@ useEffect(()=>{
           {product?.name}
         </h3>
         <p className="text-sm text-gray-600 mb-3">{product?.description}</p>
-        {/* <span className="text-2xl font-bold  text-black ">
-          {product?.price} MAD
-        </span> */}
       </div>
       {isOrderForm ? (
         <>
