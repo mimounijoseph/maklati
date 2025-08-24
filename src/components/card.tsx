@@ -39,7 +39,7 @@ function Card({
        className={`w-80 rounded-2xl bg-white/70 backdrop-blur-md
               ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(17,24,39,0.12)]
               hover:shadow-[0_16px_40px_rgba(17,24,39,0.15)] transition-shadow
-              ${isOrderForm ? "h-[520px]" : "h-[400px]"}`}
+              ${isOrderForm ? "h-[520px]" : "h-[350px]"}`}
   spotlightColor="34, 211, 238"
 >
       <div className="w-full h-full flex flex-col p-4">
@@ -66,7 +66,7 @@ function Card({
         </div>
 
   
-        {isOrderForm ? (
+        {isOrderForm && (
           <div className="mt-auto">
   
             <div className="mt-4 flex items-center justify-center gap-2">
@@ -127,18 +127,7 @@ function Card({
               </button>
             </div>
           </div>
-        ) : (
-          <div className="mt-auto flex justify-center">
-            <button
-              onClick={addToCart}
-              className="rounded-full px-5 py-2.5 bg-slate-900 text-white font-semibold
-                         hover:bg-slate-800 transition focus-visible:outline-none
-                         focus-visible:ring-2 focus-visible:ring-emerald-400/70"
-            >
-              Add
-            </button>
-          </div>
-        )}
+        ) }
       </div>
     </SpotlightCard>
   );
