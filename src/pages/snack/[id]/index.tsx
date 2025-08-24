@@ -65,7 +65,10 @@ return (
       </Tabs>
     </div>
 
-    <div className="mx-auto mt-8 grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
+    <div className="mx-auto mt-8 grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-3">
+      <Card />
+      <Card />
+      <Card />
       <Card />
       <Card />
     </div>

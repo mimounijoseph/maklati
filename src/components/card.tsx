@@ -36,19 +36,20 @@ function Card({
 
   return (
     <SpotlightCard
-      className="w-80 h-[500px] rounded-2xl bg-white/70 backdrop-blur-md
-                 ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(17,24,39,0.12)]
-                 hover:shadow-[0_16px_40px_rgba(17,24,39,0.15)] transition-shadow"
-      spotlightColor="34, 211, 238"
-    >
+       className={`w-80 rounded-2xl bg-white/70 backdrop-blur-md
+              ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(17,24,39,0.12)]
+              hover:shadow-[0_16px_40px_rgba(17,24,39,0.15)] transition-shadow
+              ${isOrderForm ? "h-[500px]" : "h-[400px]"}`}
+  spotlightColor="34, 211, 238"
+>
       <div className="w-full h-full flex flex-col p-4">
 
         <div className="relative flex items-center justify-center">
-          <img
-            src={product?.image ?? "/snack1.png"}
-            alt={product?.name ?? "Product"}
-            className="w-32 h-32 object-cover rounded-2xl ring-1 ring-slate-200"
-          />
+         <img
+    src={product?.image ?? "/images.jpg"}
+    alt={product?.name ?? "Product"}
+    className="w-full h-48 object-cover rounded-2xl ring-1 ring-slate-200"
+  />
           <span className="absolute -bottom-2 right-4 rounded-full px-3 py-1
                            text-sm font-semibold bg-white text-slate-900
                            shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
