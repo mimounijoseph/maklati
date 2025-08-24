@@ -25,19 +25,13 @@ function Card({
 
   const increment = () => {
     setQty((q) => Math.min(q + 1, 99));
-    // مثال ربط مع ستايت خارجي:
-    // setSelectedProducts?.((prev) => ({ ...prev, [product.id]: { ...prev[product.id], qty: Math.min((prev[product.id]?.qty ?? 0) + 1, 99) }}));
   };
 
   const decrement = () => {
     setQty((q) => Math.max(q - 1, 1));
-    // مثال ربط مع ستايت خارجي:
-    // setSelectedProducts?.((prev) => ({ ...prev, [product.id]: { ...prev[product.id], qty: Math.max((prev[product.id]?.qty ?? 1) - 1, 1) }}));
   };
 
   const addToCart = () => {
-    // اربط حسب حاجتك:
-    // setSelectedProducts?.((prev) => ({ ...prev, [product.id]: { ...product, size: selectedSize, qty } }));
   };
 
   return (
@@ -48,7 +42,7 @@ function Card({
       spotlightColor="34, 211, 238"
     >
       <div className="w-full h-full flex flex-col p-4">
-        {/* صورة + بادج السعر */}
+
         <div className="relative flex items-center justify-center">
           <img
             src={product?.image ?? "/snack1.png"}
@@ -62,7 +56,7 @@ function Card({
           </span>
         </div>
 
-        {/* عنوان + وصف */}
+
         <div className="mt-5 text-center px-2">
           <h3 className="text-lg font-semibold text-slate-900">{product?.name}</h3>
           <p className="mt-1 text-sm leading-6 text-slate-600">
@@ -70,10 +64,10 @@ function Card({
           </p>
         </div>
 
-        {/* منطقة التحكم */}
+  
         {isOrderForm ? (
           <div className="mt-auto">
-            {/* المقاسات */}
+  
             <div className="mt-4 flex items-center justify-center gap-2">
               {sizes.map((s) => {
                 const active = selectedSize === s;
@@ -96,7 +90,6 @@ function Card({
               })}
             </div>
 
-            {/* الكمية */}
             <div className="mt-4 flex items-center justify-center gap-4">
               <button
                 onClick={decrement}
@@ -134,7 +127,6 @@ function Card({
             </div>
           </div>
         ) : (
-          // نسخة مبسطة بلا فورم الطلب
           <div className="mt-auto flex justify-center">
             <button
               onClick={addToCart}

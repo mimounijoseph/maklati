@@ -11,7 +11,7 @@ import {
   Salad,
   CupSoda,
 } from "lucide-react";
-// أيقونات
+
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -38,7 +38,7 @@ return (
 
     <div className="w-full flex justify-center">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        
+
         <div className="inline-flex items-center rounded-2xl p-1.5
                         bg-slate-900/90 ring-1 ring-slate-800
                         shadow-[inset_0_-2px_0_rgba(255,255,255,0.06),0_8px_20px_rgba(17,24,39,0.35)]">
