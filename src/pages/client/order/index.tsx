@@ -16,15 +16,17 @@ const OrderPage = () => {
   return (
     <ProtectedPage>
       <div className="">
-        <h1 className="text-2xl font-bold mt-32 text-center"></h1>
+        <h1 className="text-2xl font-bold mt-20 text-center"></h1>
 
         <Stepper step={step} />
 
         {step === 1 && (
           <ProductSelection
+    
             selectedProducts={selectedProducts}
             setSelectedProducts={setSelectedProducts}
             next={next}
+            
           />
         )}
         {step === 2 && (
