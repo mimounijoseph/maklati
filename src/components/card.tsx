@@ -42,7 +42,7 @@ function Card({
 
   return (
     <SpotlightCard
-      className="w-80 h-[500px] rounded-2xl bg-white/70 backdrop-blur-md
+      className="w-80 h-[420px] rounded-2xl bg-white/70 backdrop-blur-md
                  ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(17,24,39,0.12)]
                  hover:shadow-[0_16px_40px_rgba(17,24,39,0.15)] transition-shadow"
       spotlightColor="34, 211, 238"
@@ -61,7 +61,8 @@ function Card({
             {product?.price} <span className="opacity-70">MAD</span>
           </span>
         </div>
-       
+
+        {/* عنوان + وصف */}
         <div className="mt-5 text-center px-2">
           <h3 className="text-lg font-semibold text-slate-900">{product?.name}</h3>
           <p className="mt-1 text-sm leading-6 text-slate-600">
@@ -69,8 +70,10 @@ function Card({
           </p>
         </div>
 
+        {/* منطقة التحكم */}
         {isOrderForm ? (
           <div className="mt-auto">
+            {/* المقاسات */}
             <div className="mt-4 flex items-center justify-center gap-2">
               {sizes.map((s) => {
                 const active = selectedSize === s;
@@ -93,6 +96,7 @@ function Card({
               })}
             </div>
 
+            {/* الكمية */}
             <div className="mt-4 flex items-center justify-center gap-4">
               <button
                 onClick={decrement}
@@ -115,6 +119,7 @@ function Card({
               </button>
             </div>
 
+            {/* CTA */}
             <div className="mt-4 flex justify-center">
               <button
                 onClick={addToCart}
@@ -129,6 +134,7 @@ function Card({
             </div>
           </div>
         ) : (
+          // نسخة مبسطة بلا فورم الطلب
           <div className="mt-auto flex justify-center">
             <button
               onClick={addToCart}

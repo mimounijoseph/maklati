@@ -18,8 +18,8 @@ export type Product = {
   price: number;
 };
 type ProductSelectionProps = {
-  selectedProducts: Product[];
-  setSelectedProducts: (products: Product[]) => void;
+  selectedProducts: any[];
+  setSelectedProducts: (products: any[]) => void;
   next: () => void;
 };
 
