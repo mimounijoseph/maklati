@@ -87,7 +87,7 @@ function Card({ product, isOrderForm }: CardTypes) {
         ...product,
         cost: product?.cost.map((e: any) => {
           if (e.type == selectedSize) {
-            return { ...e, qty }; // Initialize quantity for the selected type
+            return { ...e, quantity: qty }; // Initialize quantity for the selected type
           }
           return e;
         }),
