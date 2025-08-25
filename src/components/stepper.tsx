@@ -2,7 +2,7 @@ export const Stepper = ({ step }: { step: number }) => {
   const steps = ["Produits", "Validation", "Attente"];
 
   return (
-    <div className="flex justify-between mb-6">
+    <div className="flex justify-around mb-6">
       {steps.map((label, index) => (
         <div key={index} className="flex flex-col items-center flex-1">
           <div

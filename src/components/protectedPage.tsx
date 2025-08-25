@@ -1,31 +1,34 @@
-'use client';
+"use client";
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import useAuth from "../hooks/useAuth";
-
+import { useAuth } from "@/context/useContext";
+import { Loader } from "@/components/ui/loader";
 type ProtectedPageProps = {
   children: ReactNode;
 };
 
 const ProtectedPage = ({ children }: ProtectedPageProps) => {
-  const user = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    setTimeout(() => {
+      if (!loading && user === null) {
+        console.log(loading, user);
 
-  useEffect(() => {
-    if (isClient && user === null) {
-      // ✅ Ajoute la route actuelle dans le paramètre de redirection
-      const redirectPath = router.asPath;
-      router.push(`/auth/login?redirect=${encodeURIComponent(redirectPath)}`);
-    }
-  }, [isClient, user, router]);
+        const redirectPath = router.asPath;
+        router.push(`/auth/login?redirect=${encodeURIComponent(redirectPath)}`);
+      }
+    }, 2000);
+  }, [loading, user, router]);
 
-  if (!isClient || user === null) {
-    return <div>Loading...</div>;
+  if (loading) {
+    return     <div className="h-[60vh] flex justify-center items-center">
+      <Loader>
+      <span className="text-black dark:text-white">Getting things ready…</span>
+    </Loader>
+      </div>
+      ;
   }
 
   return <>{children}</>;

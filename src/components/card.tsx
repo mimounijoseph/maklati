@@ -1,41 +1,133 @@
 // Card.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CheckboxDropdown from "./checkbox-dropdown";
 import { SpotlightCard } from "@/components/ui/spotlightcard";
 import { Product } from "./product-selection";
-import { useState } from "react";
+import { useToast } from "@/components/ui/toast";
+import { useAuth } from "@/context/useContext";
 
 type CardTypes = {
-  product: { id: string; name: string; price: number; quantity?: number; image?: string };
-  selectedProducts?: any;
-  setSelectedProducts?: (updater: any) => void;
+  product?: Product;
   isOrderForm?: boolean;
 };
 
 function Card({
   product,
-  selectedProducts,
-  setSelectedProducts,
   isOrderForm,
 }: CardTypes) {
-  const [selectedSize, setSelectedSize] = useState<"M" | "L" | "XL">("M");
-  const [qty, setQty] = useState<number>(product?.quantity ?? 1);
+   const {selectedProducts, setSelectedProducts} = useAuth();
+  const [selectedTypes, setSelectedTypes] = useState<any[]>([]);
+  const { toast } = useToast();
+  const sizes:any=["M","L","XL"];
+  const [selectedSize,setSelectedSize]=useState(product?.cost[0].type);
+  const [qty,setQty]=useState(0)
+  const [price,setPrice] = useState(product?.cost[0].price)
+  function showToast(
+    title: string,
+    message: string,
+    variant:
+      | "success"
+      | "default"
+      | "destructive"
+      | "warning"
+      | "info"
+      | undefined
+  ) {
+    toast({
+      title: title,
+      description: message,
+      variant: variant,
+      duration: 2500,
+    });
+  }
 
-  const sizes: Array<"M" | "L" | "XL"> = ["M", "L", "XL"];
+  function addProduct(product: any, type: string) {
+    if (!selectedTypes.includes(type)) {
+      setSelectedTypes([...selectedTypes, type]);
+    }
 
-  const increment = () => {
-    setQty((q) => Math.min(q + 1, 99));
-  };
+    let selectedProduct = selectedProducts.find((p: any) => p.id == product.id);
 
-  const decrement = () => {
-    setQty((q) => Math.max(q - 1, 1));
-  };
+    if (selectedProduct) {
+      // If the product already exists, update the quantity of the selected type
+      const updatedProducts = selectedProducts.map((p: any) => {
+        if (p.id == product.id) {
+          const updatedCost = p.cost.map((e: any) => {
+            if (e.type == type) {
+              return { ...e, quantity: e.quantity + 1 }; // Update the quantity
+            }
+            return e;
+          });
+          return { ...p, cost: updatedCost };
+        }
+        return p;
+      });
+      setSelectedProducts(updatedProducts);
+    } else {
+      // If the product does not exist, add it to the selected products array
+      const newProduct = {
+        ...product,
+        cost: product.cost.map((e: any) => {
+          if (e.type == type) {
+            return { ...e, quantity: 1 }; // Initialize quantity for the selected type
+          }
+          return e;
+        })
+      };
+      setSelectedProducts([...selectedProducts, newProduct]);
+    }
 
-  const addToCart = () => {
-  };
+    showToast(
+      `${product?.name}`,
+      `${product?.name} of type ${type} was added successfully to your order`,
+      "success"
+    );
+}
+
+useEffect(()=>{
+  setSelectedTypes([])
+  let myProduct:any = selectedProducts.find((p:any)=>p.id==product?.id)
+  if(myProduct){
+      let newSelectedTypes:any[] = []
+    myProduct.cost.map((c:any)=>{
+      if(c.quantity>0){
+        newSelectedTypes.push(c.type)
+      }
+    })
+    setSelectedTypes(newSelectedTypes)
+  }
+  
+},[selectedProducts])
+
+  function decrement(): void {
+    if(qty>0)
+    setQty(qty-1)
+  }
+
+  function increment(): void {
+    setQty(qty+1)
+  }
+
+function toggleSize(s:any): void {
+      setSelectedSize(s)
+      let price = (product?.cost.find((e:any)=>e.type==s))?.price
+      setPrice(price)
+    }
+
+  function addToCart(): void {
+
+    let prod = {
+      ...product
+    }
+    
+  }
 
   return (
+
+    //dyali
+
     <SpotlightCard
+
        className={`w-80 rounded-2xl bg-white/70 backdrop-blur-md
               ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(17,24,39,0.12)]
               hover:shadow-[0_16px_40px_rgba(17,24,39,0.15)] transition-shadow
@@ -45,15 +137,15 @@ function Card({
       <div className="w-full h-full flex flex-col p-4">
 
         <div className="relative flex items-center justify-center">
-         <img
-    src={product?.image ?? "/images.jpg"}
-    alt={product?.name ?? "Product"}
-    className="w-full h-48 object-cover rounded-2xl ring-1 ring-slate-200"
-  />
+                <img
+            src={product?.image ?? "/images.jpg"}
+            alt={product?.name ?? "Product"}
+            className="w-full h-48 object-cover rounded-2xl ring-1 ring-slate-200"
+          />
           <span className="absolute -bottom-2 right-4 rounded-full px-3 py-1
                            text-sm font-semibold bg-white text-slate-900
                            shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
-            {product?.price} <span className="opacity-70">MAD</span>
+             <span className="opacity-70">{price} MAD</span>
           </span>
         </div>
 
@@ -67,16 +159,18 @@ function Card({
 
   
         {isOrderForm && (
+          <>
+       
           <div className="mt-auto">
   
             <div className="mt-4 flex items-center justify-center gap-2">
-              {sizes.map((s) => {
+              {sizes.map((s:any) => {
                 const active = selectedSize === s;
                 return (
                   <button
                     key={s}
                     type="button"
-                    onClick={() => setSelectedSize(s)}
+                    onClick={() => toggleSize(s)}
                     className={`relative inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-medium transition-all
                       ring-1 focus:outline-none focus-visible:ring-2
                       ${active
@@ -127,8 +221,25 @@ function Card({
               </button>
             </div>
           </div>
+                    <div className="absolute top-1 right-1">
+            <button className="relative inline-flex items-center  text-sm font-medium text-center text-white  focus:ring-4 focus:outline-none">
+              <img
+                src="/plat.png"
+                alt="add plat icon"
+                width={"40px"}
+                className=""
+              />
+              <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-1 -end-1 dark:border-gray-900">
+                {selectedTypes.length}
+              </div>
+            </button>
+          </div>
+             </>
         ) }
-      </div>
+        </div>
+
+
+
     </SpotlightCard>
   );
 }
