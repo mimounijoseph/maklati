@@ -141,7 +141,7 @@ export const OrderReview = ({ next, prev }: OrderReviewProps) => {
           ))
         )}
       </ul>
-      <div className="flex flex-col space-e-2 justify-between items-end  md:flex-row md:justify-center">
+      <div className="flex flex-col-reverse space-e-2 justify-between items-center mt-5 md:mt-0  md:flex-row md:justify-between md:items-end">
         <div className="flex gap-5 items-center justify-center">
           <button
             onClick={prev}
