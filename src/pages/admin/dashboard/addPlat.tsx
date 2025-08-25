@@ -1,5 +1,6 @@
 import React, {FC,useState} from 'react'
 import Sidebar from './sidebar';
+import PexelsSearchModal from "../../../components/PexelsSearch"; // adjust the path
 import { collection, addDoc } from "firebase/firestore";
 import { db, auth } from "../../../config/firebase"; // adjust the path
 
@@ -194,20 +195,15 @@ const AddPlat: FC = () => {
           />
         </div>
 
-        {/* URL Photo */}
-        <div className="md:col-span-2">
-          <label className="block mb-2 text-sm font-medium text-gray-900">
-            Photo URL
-          </label>
-          <input
-            type="url"
-            name="urlPhoto"
-            value={formData.urlPhoto}
-            onChange={handleChange}
-            className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
-            required
-          />
-        </div>
+      {/* Pexels Photo Selector */}
+      <div className="mb-4">
+        <label className="block mb-2 text-sm font-medium">Photo</label>
+        <PexelsSearchModal onSelect={(url) => setFormData({ ...formData, urlPhoto: url })} />
+        {formData.urlPhoto && (
+          <img src={formData.urlPhoto} alt="Selected" className="mt-2 h-40 rounded-lg" />
+        )}
+      </div>
+      
       </div>
 
       <button
