@@ -113,6 +113,7 @@ export const OrderReview = ({ next, prev }: OrderReviewProps) => {
                       <dd className="mt-1 text-sm text-gray-700 sm:mt-0">
                         {p.quantity} unity * {p.price} MAD
                       </dd>
+                      <div className="flex sm:flex-col md:flex-row justify-end items-center sm:mt-3 md:mt-0 sm:gap-5 md:gap-0">
                       <div className="flex items-center justify-center gap-4">
                         <button
                           onClick={() => decrement(product, index)}
@@ -131,6 +132,7 @@ export const OrderReview = ({ next, prev }: OrderReviewProps) => {
                         </button>
                       </div>
                       <span className="ml-2">{p.quantity * p.price} MAD</span>
+                      </div>
                     </div>
                   </dl>
                 </div>
@@ -139,8 +141,8 @@ export const OrderReview = ({ next, prev }: OrderReviewProps) => {
           ))
         )}
       </ul>
-      <div className="flex space-e-2 justify-between items-center">
-        <div className="flex gap-5">
+      <div className="flex flex-col space-e-2 justify-between items-end  md:flex-row md:justify-center">
+        <div className="flex gap-5 items-center justify-center">
           <button
             onClick={prev}
             className="bg-black text-white px-4 py-2 rounded block m-auto mt-10 cursor-pointer"
