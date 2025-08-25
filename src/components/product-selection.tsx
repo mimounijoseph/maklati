@@ -100,7 +100,7 @@ export const ProductSelection = ({ next }: ProductSelectionProps) => {
   ]);
   const [selectedCategory, setSelectedCategory] = useState("tacos");
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-const {selectedProducts} = useAuth();
+  const {selectedProducts} = useAuth();
   function updateProductsDisplay() {
     let data = products.filter((p) => p.category == selectedCategory);
     setFilteredProducts(data);
@@ -123,7 +123,10 @@ const {selectedProducts} = useAuth();
             Menu
           </h1>
         </header>
+
+
         <div className="flex justify-center gap-3 mb-12">
+      
           <div className="">
             <ul className="flex sm:w-[100%] md:w-fit sm:overflow-auto -mb-px text-sm font-medium text-center text-gray-500  dark:text-black">
               <li
@@ -242,6 +245,8 @@ const {selectedProducts} = useAuth();
             </ul>
           </div>
         </div>
+
+
     </div>
         <div className="flex gap-4 justify-center items-center flex-wrap">
           {filteredProducts.map((product, index) => (
