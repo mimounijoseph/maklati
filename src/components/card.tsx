@@ -1,7 +1,5 @@
 // Card.tsx
-
 import React, { useEffect, useState } from "react";
-
 import { SpotlightCard } from "@/components/ui/spotlightcard";
 import { Product } from "./product-selection";
 import { useToast } from "@/components/ui/toast";
@@ -114,7 +112,6 @@ function Card({ product, isOrderForm }: CardTypes) {
               ${isOrderForm ? "h-[520px]" : "h-[350px]"}`}
       spotlightColor="34, 211, 238"
     >
-
       <div className="w-full h-full flex flex-col p-4">
         <div className="relative flex items-center justify-center">
           <img
@@ -130,7 +127,6 @@ function Card({ product, isOrderForm }: CardTypes) {
             <span className="opacity-70">{price} MAD</span>
           </span>
         </div>
-
 
         <div className="mt-5 text-center px-2">
           <h3 className="text-lg font-semibold text-slate-900">
