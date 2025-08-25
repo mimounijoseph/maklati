@@ -24,7 +24,8 @@ function showToast(title: string, message: string, variant: "success" | "default
     showToast("success !","You're logged out","success")
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+  }, [user]);
 
   return (
     <div>
@@ -50,14 +51,14 @@ function showToast(title: string, message: string, variant: "success" | "default
                 >
                   Logout
                 </a>
-                <p className="flex gap-2 items-center">
+                <div className="flex gap-2 items-center">
                 <p className="text-lg font-normal text-sm text-amber-600" >{user.displayName}</p>
                 <img
-                  src={user.photoURL || ""}
+                  src={user?.photoURL as string}
                   alt="profile"
                   className="w-10 h-10 rounded-full mx-auto"
                 />
-                </p>
+                </div>
               </>
             ) : (
               <>
