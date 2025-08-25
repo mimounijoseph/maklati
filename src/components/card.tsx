@@ -37,6 +37,13 @@ function Card({ product, isOrderForm }: CardTypes) {
     });
   }
 
+  useEffect(()=>{
+     let prod = selectedProducts.find((p:any)=>p.id==product?.id)
+     if(prod){
+      setTotalProduct(prod?.cost.reduce((sum:any, item:any) => sum + item.quantity, 0))
+     }
+  },[])
+
   useEffect(() => {
   }, [selectedProducts]);
 
