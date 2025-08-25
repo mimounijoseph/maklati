@@ -42,9 +42,9 @@ function Card({
   }
 
   function addProduct(product: any, type: string) {
-    if (!selectedTypes.includes(type)) {
-      setSelectedTypes([...selectedTypes, type]);
-    }
+    // if (!selectedTypes.includes(type)) {
+    //   setSelectedTypes([...selectedTypes, type]);
+    // }
 
     let selectedProduct = selectedProducts.find((p: any) => p.id == product.id);
 
@@ -115,10 +115,42 @@ function toggleSize(s:any): void {
     }
 
   function addToCart(): void {
+    let selectedProduct = selectedProducts.find((p: any) => p.id == product?.id);
 
-    let prod = {
-      ...product
+    if (selectedProduct) {
+      // If the product already exists, update the quantity of the selected type
+      const updatedProducts = selectedProducts.map((p: any) => {
+        if (p.id == product?.id) {
+          const updatedCost = p.cost.map((e: any) => {
+            if (e.type == selectedSize) {
+              return { ...e, quantity: qty }; // Update the quantity
+            }
+            return e;
+          });
+          return { ...p, cost: updatedCost };
+        }
+        return p;
+      });
+      setSelectedProducts(updatedProducts);
+    } else {
+      // If the product does not exist, add it to the selected products array
+      const newProduct = {
+        ...product,
+        cost: product?.cost.map((e: any) => {
+          if (e.type == selectedSize) {
+            return { ...e, qty }; // Initialize quantity for the selected type
+          }
+          return e;
+        })
+      };
+      setSelectedProducts([...selectedProducts, newProduct]);
     }
+
+    showToast(
+      `${product?.name}`,
+      `${qty} of type ${selectedSize} was added successfully to your order`,
+      "success"
+    );
     
   }
 
