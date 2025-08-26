@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Sansita_Swashed } from "next/font/google";
 import Card from "@/components/card";
 import { MorphoTextFlip } from "@/components/ui/morphotextflip";
 import { InteractiveInput } from "@/components/ui/interactive-input";
+import Layout from "./core/layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export default function Home() {
   return (
-    <>
+    <Layout>
       <section className="p-3 flex flex-col md:flex-row justify-center gap-2 align-middle">
         <div>
           <h1
@@ -58,6 +59,6 @@ export default function Home() {
         </div>
         <img src="hero_img.png" alt="burger" width="500px" />
       </section>
-    </>
+    </Layout>
   );
 }

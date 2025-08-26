@@ -5,32 +5,40 @@ import { useAuth } from "../../../context/useContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../config/firebase";
 
-
 function Header() {
   const { toast } = useToast();
   const { user, loading } = useAuth();
 
-function showToast(title: string, message: string, variant: "success" | "default" | "destructive" | "warning" | "info" | undefined) {
-        toast({
-            title: title,
-            description: message,
-            variant: variant,
-            duration: 2000,
-        });
-    }
+  function showToast(
+    title: string,
+    message: string,
+    variant:
+      | "success"
+      | "default"
+      | "destructive"
+      | "warning"
+      | "info"
+      | undefined
+  ) {
+    toast({
+      title: title,
+      description: message,
+      variant: variant,
+      duration: 2000,
+    });
+  }
 
   const logout = async () => {
     await signOut(auth);
-    showToast("success !","You're logged out","success")
+    showToast("success !", "You're logged out", "success");
   };
 
-  useEffect(() => {
-  }, [user]);
+  useEffect(() => {}, [user]);
 
   return (
     <div>
       <nav className="border-gray-200 bg-transparent">
-        <div className="flex flex-wrap items-center justify-between max-w-screen-xl mx-auto p-4">
+        <div className="flex flex-wrap items-center justify-between flex-shrink-0 max-w-screen-xl mx-auto p-4">
           {/* <a href="https://flowbite.com" className="flex items-center space-x-3 rtl:space-x-reverse"> */}
           {/* <img src="logo.png" width="140px" alt="maklati Logo" /> */}
           <a
@@ -42,7 +50,7 @@ function showToast(title: string, message: string, variant: "success" | "default
           </a>
           {/* </a> */}
           <div className="flex items-center md:order-2 space-x-1 md:space-x-2 rtl:space-x-reverse">
-            {user ? (
+            {/* {user ? (
               <>
                 <a
                   href="/auth/login"
@@ -52,12 +60,14 @@ function showToast(title: string, message: string, variant: "success" | "default
                   Logout
                 </a>
                 <div className="flex gap-2 items-center">
-                <p className="text-lg font-normal text-sm text-amber-600" >{user.displayName}</p>
-                <img
-                  src={user?.photoURL as string}
-                  alt="profile"
-                  className="w-10 h-10 rounded-full mx-auto"
-                />
+                  <p className="text-lg font-normal text-sm text-amber-600">
+                    {user.displayName}
+                  </p>
+                  <img
+                    src={user?.photoURL as string}
+                    alt="profile"
+                    className="w-10 h-10 rounded-full mx-auto"
+                  />
                 </div>
               </>
             ) : (
@@ -68,21 +78,21 @@ function showToast(title: string, message: string, variant: "success" | "default
                 >
                   Login
                 </a>
-                {/* <a
+                <a
                   href="/auth/register"
                   className="text-white hover:bg-amber-600 focus:ring-4  font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5  focus:outline-none "
                 >
                   Sign up
-                </a> */}
+                </a>
               </>
-            )}
+            )} */}
 
             {/* <ThemeSwitchIcon/> */}
 
             <button
               data-collapse-toggle="mega-menu"
               type="button"
-              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg md:hidden hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-600"
               aria-controls="mega-menu"
               aria-expanded="false"
             >
@@ -106,9 +116,9 @@ function showToast(title: string, message: string, variant: "success" | "default
           </div>
           <div
             id="mega-menu"
-            className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+            className="items-center  hidden w-full md:flex md:w-auto md:order-2"
           >
-            <ul className="flex flex-col mt-4 font-medium md:flex-row md:mt-0 md:space-x-8 rtl:space-x-reverse">
+            <ul className="flex flex-col md:items-center mt-4 font-medium md:flex-row md:mt-0 md:space-x-8 rtl:space-x-reverse">
               <li>
                 <a
                   href="/"
@@ -220,6 +230,50 @@ function showToast(title: string, message: string, variant: "success" | "default
                   Contact
                 </a>
               </li>
+              {user ? (
+                <>
+                  <li className="text-center mt-10 mb-5 md:ms-24 md:mb-0 md:mt-0">
+                    <a
+                      href="/auth/login"
+                      className="text-white bg-amber-600 md:bg-transparent hover:bg-amber-600  focus:ring-4 font-medium rounded-lg text-sm px-14  py-2 md:px-5 md:py-2.5 focus:outline-none"
+                      onClick={logout}
+                    >
+                      Logout
+                    </a>
+                  </li>
+                  <li>
+                    <div className="flex justify-center gap-2 items-center w-fit m-auto md:mt-2">
+                      <p className="font-normal text-sm text-amber-600">
+                        {user.displayName}
+                      </p>
+                      <img
+                        src={user?.photoURL as string}
+                        alt="profile"
+                        className="w-10 h-10 rounded-full mx-auto"
+                      />
+                    </div>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <a
+                      href="/auth/login"
+                      className="text-white hover:bg-amber-600 focus:ring-4 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 focus:outline-none"
+                    >
+                      Login
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/auth/register"
+                      className="text-white hover:bg-amber-600 focus:ring-4  font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5  focus:outline-none "
+                    >
+                      Sign up
+                    </a>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>
@@ -229,4 +283,3 @@ function showToast(title: string, message: string, variant: "success" | "default
 }
 
 export default Header;
-

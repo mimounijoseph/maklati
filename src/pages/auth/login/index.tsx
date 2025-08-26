@@ -10,6 +10,7 @@ import {
   User,
 } from "firebase/auth";
 import { useRouter } from "next/router";
+import Layout from "@/pages/core/layout";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -58,6 +59,7 @@ export default function Login() {
   };
 
   return (
+    <Layout>
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-4">Login</h1>
@@ -141,5 +143,6 @@ export default function Login() {
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </Card>
     </div>
+    </Layout>
   );
 }

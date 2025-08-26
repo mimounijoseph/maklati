@@ -1,6 +1,7 @@
 import { Snack } from "@/interfaces/snack";
 import CenteredImageCard from "@/components/ui/profilecard";
 import React, { useEffect, useState } from "react";
+import Layout from "../core/layout";
 
 function Menu() {
   const [query, setQuery] = useState("");
@@ -48,6 +49,7 @@ function Menu() {
     : results;
 
   return (
+    <Layout>
     <div className="pt-10">
       <h1 className="text-center text-4xl mb-4">Snacks</h1>
       <div className="w-[30%] m-auto flex gap-1  justify-center items-center">
@@ -79,6 +81,7 @@ function Menu() {
         ))}
       </div>
     </div>
+    </Layout>
   );
 }
 

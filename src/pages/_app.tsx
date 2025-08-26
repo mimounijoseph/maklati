@@ -6,9 +6,7 @@ import { AuthProvider } from "@/context/useContext";
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
-      <Layout>
         <Component {...pageProps} />
-      </Layout>
     </AuthProvider>
   );
 }
