@@ -4,34 +4,30 @@ import { ProductSelection } from "@/components/product-selection";
 import ProtectedPage from "@/components/protectedPage";
 import { Stepper } from "@/components/stepper";
 import { useAuth } from "@/context/useContext";
+import Layout from "@/pages/core/layout";
 import { useState } from "react";
 
 const OrderPage = () => {
   const [step, setStep] = useState(1);
-  const {selectedProducts} = useAuth();
+  const { selectedProducts } = useAuth();
   const [orderConfirmed, setOrderConfirmed] = useState(false);
 
   const next = () => setStep((prev) => prev + 1);
   const prev = () => setStep((prev) => prev - 1);
 
   return (
-    <ProtectedPage>
-      <div className="">
-        <h1 className="text-2xl font-bold mt-32 text-center"></h1>
-        <Stepper step={step} />
+    <Layout>
+      <ProtectedPage>
+        <div className="">
+          <h1 className="text-2xl font-bold mt-32 text-center"></h1>
+          <Stepper step={step} />
 
-        {step === 1 && (
-          <ProductSelection
-            next={next}
-            
-          />
-        )}
-        {step === 2 && (
-          <OrderReview  next={next} prev={prev} />
-        )}
-        {step === 3 && <OrderConfirmation />}
-      </div>
-    </ProtectedPage>
+          {step === 1 && <ProductSelection next={next} />}
+          {step === 2 && <OrderReview next={next} prev={prev} />}
+          {step === 3 && <OrderConfirmation />}
+        </div>
+      </ProtectedPage>
+    </Layout>
   );
 };
 
