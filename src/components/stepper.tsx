@@ -1,8 +1,8 @@
 export const Stepper = ({ step }: { step: number }) => {
-  const steps = ["Produits", "Validation", "Attente"];
+  const steps = ["Add your order", "Validate your order", "Wait for your order"];
 
   return (
-    <div className="flex justify-around mb-6">
+    <div className="flex justify-around mb-6 md:w-[60%] md:mx-auto ">
       {steps.map((label, index) => (
         <div key={index} className="flex flex-col items-center flex-1">
           <div

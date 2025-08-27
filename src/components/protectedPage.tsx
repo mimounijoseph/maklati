@@ -22,15 +22,17 @@ const ProtectedPage = ({ children }: ProtectedPageProps) => {
     }, 2000);
   }, [loading, user, router]);
 
-  if (loading) {
-    return     <div className="h-[60vh] flex justify-center items-center">
-      <Loader>
-      <span className="text-black dark:text-white">Getting things ready…</span>
-    </Loader>
+  if (loading || (!loading && !user)) {
+    return (
+      <div className="h-[60vh] flex justify-center items-center">
+        <Loader>
+          <span className="text-black dark:text-white">
+            Getting things ready…
+          </span>
+        </Loader>
       </div>
-      ;
+    );
   }
-
   return <>{children}</>;
 };
 

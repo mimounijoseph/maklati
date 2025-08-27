@@ -2,18 +2,74 @@ import { useAuth } from "@/context/useContext";
 import { Product } from "./product-selection";
 import { useEffect, useState } from "react";
 import { useToast } from "./ui/toast";
-
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+} from "firebase/firestore";
+import { db, auth } from "../config/firebase";
+import { Order } from "@/interfaces/order";
+import Products from "@/pages/snack/[id]";
 
 type OrderReviewProps = {
   next: () => void;
   prev: () => void;
+  menuId?: any;
 };
-export const OrderReview = ({ next, prev }: OrderReviewProps) => {
+export const OrderReview = ({ next, prev, menuId }: OrderReviewProps) => {
   const { selectedProducts, setSelectedProducts } = useAuth();
   const [total, setTotal] = useState(0);
   const { toast } = useToast();
 
-    function showToast(
+  const [formData, setFormData] = useState<Order>({
+    number: null,
+    date: new Date(),
+    products: [],
+    total: null,
+    userUID: null,
+    menuId: menuId ?? 1,
+  });
+
+  async function addOrder() {
+    try {
+      const ordersRef = collection(db, "orders");
+
+      // Étape 1 : Récupérer le dernier document par order décroissant sur le champ `number`
+      const q = query(ordersRef, orderBy("number", "desc"), limit(1));
+      const querySnapshot = await getDocs(q);
+
+      let newNumber = 0;
+      if (!querySnapshot.empty) {
+        const lastOrder = querySnapshot.docs[0].data();
+        newNumber = lastOrder.number + 1;
+      } else {
+        newNumber = 1;
+      }
+
+      // Étape 2 : Créer le nouveau document avec `number`
+      const newOrder = {
+        ...formData,
+        products: selectedProducts,
+        total: total,
+        userUID: auth.currentUser?.uid,
+        number: newNumber,
+      };
+
+      await addDoc(ordersRef, newOrder);
+      showToast(
+        "Confirmed",
+        "Your order will be prepared as soon as possible 😊",
+        "success"
+      );
+    } catch (error) {
+      console.error("Error adding order: ", error);
+    }
+  }
+
+  function showToast(
     title: string,
     message: string,
     variant:
@@ -54,8 +110,8 @@ export const OrderReview = ({ next, prev }: OrderReviewProps) => {
       if (myProduct) {
         const updatedProducts = selectedProducts.map((p: any) => {
           if (p.id == product?.id) {
-            const updatedCost = p.cost.map((e: any,index1:number) => {
-              if (index==index1) {
+            const updatedCost = p.cost.map((e: any, index1: number) => {
+              if (index == index1) {
                 e.quantity--; // Update the quantity
               }
               return e;
@@ -70,23 +126,21 @@ export const OrderReview = ({ next, prev }: OrderReviewProps) => {
   }
 
   function increment(product: any, index: number): void {
-    
-      let myProduct = selectedProducts.find((p: any) => p.id == product.id);
-      if (myProduct) {
-        const updatedProducts = selectedProducts.map((p: any) => {
-          if (p.id == product?.id) {
-            const updatedCost = p.cost.map((e: any,index1:number) => {
-              if (index==index1) {
-                
-                e.quantity++;
-              }
-              return e;
-            });
-            return { ...p, cost: updatedCost };
-          }
-          return p;
-        });
-        setSelectedProducts(updatedProducts);
+    let myProduct = selectedProducts.find((p: any) => p.id == product.id);
+    if (myProduct) {
+      const updatedProducts = selectedProducts.map((p: any) => {
+        if (p.id == product?.id) {
+          const updatedCost = p.cost.map((e: any, index1: number) => {
+            if (index == index1) {
+              e.quantity++;
+            }
+            return e;
+          });
+          return { ...p, cost: updatedCost };
+        }
+        return p;
+      });
+      setSelectedProducts(updatedProducts);
     }
   }
 
@@ -97,9 +151,8 @@ export const OrderReview = ({ next, prev }: OrderReviewProps) => {
       </h1>
       <ul className="mb-4">
         {selectedProducts.map((product: any) =>
-          product?.cost.map((p: any, index: number) => (
-            <>
-              {p.quantity > 0 && (
+          product?.cost.map((p: any, index: number) => {
+              return p.quantity > 0 && (
                 // <li key={product.id}>
                 //   ✅ {product.name}
                 // </li>
@@ -114,32 +167,32 @@ export const OrderReview = ({ next, prev }: OrderReviewProps) => {
                         {p.quantity} unity * {p.price} MAD
                       </dd>
                       <div className="flex sm:flex-col md:flex-row justify-end items-center sm:mt-3 md:mt-0 sm:gap-5 md:gap-0">
-                      <div className="flex items-center justify-center gap-4">
-                        <button
-                          onClick={() => decrement(product, index)}
-                          className="w-8 h-8 text-lg font-bold text-white bg-red-500 rounded-full hover:bg-red-600 transition cursor-pointer"
-                        >
-                          −
-                        </button>
-                        <span className="text-lg font-medium text-black">
-                          {p.quantity}
-                        </span>
-                        <button
-                          onClick={() => increment(product, index)}
-                          className="w-8 h-8 text-lg font-bold text-white bg-green-500 rounded-full hover:bg-green-600 transition cursor-pointer"
-                        >
-                          +
-                        </button>
-                      </div>
-                      <span className="ml-2">{p.quantity * p.price} MAD</span>
+                        <div className="flex items-center justify-center gap-4">
+                          <button
+                            onClick={() => decrement(product, index)}
+                            className="w-8 h-8 text-lg font-bold text-white bg-red-500 rounded-full hover:bg-red-600 transition cursor-pointer"
+                          >
+                            −
+                          </button>
+                          <span className="text-lg font-medium text-black">
+                            {p.quantity}
+                          </span>
+                          <button
+                            onClick={() => increment(product, index)}
+                            className="w-8 h-8 text-lg font-bold text-white bg-green-500 rounded-full hover:bg-green-600 transition cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="ml-2">{p.quantity * p.price} MAD</span>
                       </div>
                     </div>
                   </dl>
                 </div>
-              )}
-            </>
+              )
+          }
           ))
-        )}
+        }
       </ul>
       <div className="flex flex-col-reverse space-e-2 justify-between items-center mt-5 md:mt-0  md:flex-row md:justify-between md:items-end">
         <div className="flex gap-5 items-center justify-center">
@@ -150,9 +203,9 @@ export const OrderReview = ({ next, prev }: OrderReviewProps) => {
             Retour
           </button>
           <button
-            onClick={()=>{
-              showToast('Confirmed','Your order will be prepared as soon as possible 😊','success')
-              next()
+            onClick={() => {
+              addOrder()
+              next();
             }}
             className="bg-red-500 text-white px-4 py-2 rounded block m-auto mt-10 cursor-pointer"
           >

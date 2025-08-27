@@ -13,6 +13,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Layout from "@/pages/core/layout";
 
 function Products() {
   const [activeTab, setActiveTab] = useState("all");
@@ -112,7 +113,8 @@ function Products() {
     useEffect(() => {}, [filteredProducts]);
   
 return (
-  <div className="min-h-screen w-screen p-6 m-auto text-slate-900 bg-gradient-to-b from-amber-400 to-yellow-300">
+  <Layout>
+  <div style={{fontFamily:'serif'}} className="min-h-screen w-screen p-6 m-auto text-slate-900 bg-gradient-to-b from-amber-400 to-yellow-300">
     <header className="text-center mb-10">
       <h1 className="text-5xl font-bold text-black mb-1">Menu</h1>
       <p className="text-slate-700">Choose your favorite category</p>
@@ -265,6 +267,8 @@ return (
       Order now
     </AnimatedButton>
   </div>
+  </Layout>
+
 );
 
 }

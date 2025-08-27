@@ -1,21 +1,11 @@
 import React, {FC,useState} from 'react'
 import Sidebar from './sidebar';
-import PexelsSearchModal from "../../../components/pexelsSearch"; // adjust the path
 import { collection, addDoc } from "firebase/firestore";
 import { db, auth } from "../../../config/firebase"; // adjust the path
+import { Plat } from '@/interfaces/product';
+import PexelsSearchModal from '@/components/pexelsSearch';
 
-interface Plat {
-  id: number;
-  name: string;
-  description: string;
-  status: boolean;
-  category: string;
-  size: string;
-  price: number;
-  urlPhoto: string;
-  userId?: string;
-  createdAt?: Date;
-}
+
 
 
 
@@ -85,7 +75,7 @@ const AddPlat: FC = () => {
 
 
   return (
-    <div className='bg-white'>
+    <div style={{fontFamily:'sans-serif'}}>
       <Sidebar />
       <div className="p-4 sm:ml-64">
         <div className=" dark:border-gray-700 mt-14">
