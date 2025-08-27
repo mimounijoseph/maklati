@@ -28,7 +28,7 @@ export const OrderConfirmation = () => {
         const lastOrder = querySnapshot.docs[0].data();
         setOrderNumber(lastOrder.number)
         setContent({
-          title:`Your order number is ${lastOrder.number}`,
+          title:`Order number is ${lastOrder.number}`,
           message:'Thank you for your order',
           loading:'⌛ Your order will be prepared as soon as possible'
         })
@@ -55,6 +55,7 @@ export const OrderConfirmation = () => {
       <h2 className="text-2xl font-bold text-amber-600">{content?.title}</h2>
       <p className="mt-2 text-black">{content?.message}</p>
       <div className="mt-4 animate-pulse text-black">{content?.loading}</div>
+      <img src="/fast-food.gif" alt='frying animation svg'/>
     </div>
   );
 };
