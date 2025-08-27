@@ -1,4 +1,8 @@
 export interface Snack {
-  name: string;
-  image: string;
+  id?:any
+  name?: any,
+  image?: any,
+  address?:any,
+  phone?:any,
+  ownerUID?:any
 }

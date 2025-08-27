@@ -6,6 +6,6 @@ export interface Plat {
   size: string;
   price: number;
   urlPhoto: string;
-  userId?: string;
+  snackId?: string;
   createdAt?: Date;
 }
