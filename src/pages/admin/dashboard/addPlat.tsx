@@ -1,6 +1,6 @@
 import React, {FC,useState} from 'react'
 import Sidebar from './sidebar';
-import PexelsSearchModal from "../../../components/PexelsSearch"; // adjust the path
+import PexelsSearchModal from "../../../components/pexelsSearch"; // adjust the path
 import { collection, addDoc } from "firebase/firestore";
 import { db, auth } from "../../../config/firebase"; // adjust the path
 
@@ -8,6 +8,7 @@ interface Plat {
   id: number;
   name: string;
   description: string;
+  status: boolean;
   category: string;
   size: string;
   price: number;
@@ -25,6 +26,7 @@ const AddPlat: FC = () => {
     id: 0,
     name: "",
     description: "",
+    status: true,
     category: "",
     size: "",
     price: 0,
@@ -70,6 +72,7 @@ const AddPlat: FC = () => {
         id: 0,
         name: "",
         description: "",
+        status: false,
         category: "",
         size: "",
         price: 0,
@@ -82,10 +85,10 @@ const AddPlat: FC = () => {
 
 
   return (
-    <div>
+    <div className='bg-white'>
       <Sidebar />
       <div className="p-4 sm:ml-64">
-        <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-14">
+        <div className=" dark:border-gray-700 mt-14">
           <form
       onSubmit={handleSubmit}
       className="p-6 bg-white rounded-lg shadow-md max-w-lg mx-auto"
@@ -203,7 +206,6 @@ const AddPlat: FC = () => {
           <img src={formData.urlPhoto} alt="Selected" className="mt-2 h-40 rounded-lg" />
         )}
       </div>
-      
       </div>
 
       <button
