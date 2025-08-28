@@ -1,18 +1,16 @@
 import React, { FC } from "react";
 import Sidebar from "./sidebar";
-
-import PexelsSearchModal from "@/components/pexelsSearch";
+import UrlInput from "@/components/urlInput";
+import QrCodeGenerator from '@/components/qrcode';
 
 const Index: FC = () => {
   return (
-    <div style={{fontFamily:'sans-serif'}}>
+    <div className="h-full bg-white" style={{fontFamily:'sans-serif'}}>
       <Sidebar />
       <div className="h-screen p-4 sm:ml-64">
         <div className=" mt-14">
-             {/* Pexels Search Component */}
-      <PexelsSearchModal
-        onSelect={() => alert("")}
-      />
+            <UrlInput/>
+              <QrCodeGenerator menuId="123" />
         </div>
       </div>
     </div>

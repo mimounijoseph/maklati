@@ -62,7 +62,7 @@ const Plats: FC = () => {
   };
 
   return (
-    <div className="bg-white h-screen">
+     <div className="h-full bg-white" style={{fontFamily:'sans-serif'}}>
       <Sidebar />
       <div className="sm:ml-64">
         <div className="p-4 dark:border-gray-700 mt-14">
