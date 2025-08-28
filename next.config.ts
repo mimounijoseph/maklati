@@ -6,14 +6,19 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'github.com',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "github.com",
+        pathname: "/**",
       },
-            {
-        protocol: 'https',
-        hostname: 'github.githubassets.com',
-        pathname: '/**',
+      {
+        protocol: "https",
+        hostname: "github.githubassets.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+        pathname: "/**",
       },
     ],
   },

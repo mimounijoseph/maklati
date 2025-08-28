@@ -12,14 +12,14 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../config/firebase";
 import { Order } from "@/interfaces/order";
-import Products from "@/pages/snack/[id]";
+
 
 type OrderReviewProps = {
   next: () => void;
   prev: () => void;
-  menuId?: any;
+  snackId: any;
 };
-export const OrderReview = ({ next, prev, menuId }: OrderReviewProps) => {
+export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
   const { selectedProducts, setSelectedProducts } = useAuth();
   const [total, setTotal] = useState(0);
   const { toast } = useToast();
@@ -30,7 +30,7 @@ export const OrderReview = ({ next, prev, menuId }: OrderReviewProps) => {
     products: [],
     total: null,
     userUID: null,
-    menuId: menuId ?? 1,
+    snackId: snackId,
   });
 
   async function addOrder() {
@@ -159,7 +159,7 @@ export const OrderReview = ({ next, prev, menuId }: OrderReviewProps) => {
                 <div key={index} className="mt-6 border-t border-black/40">
                   <dl className="divide-y divide-gray/10">
                     <div className="px-4 py-6 sm:flex sm:items-center sm:justify-between sm:gap-4 sm:px-0">
-                      <img src="/plat.png" alt="product image" width={"50px"} />
+                      <img src={product.urlPhoto} alt="product image" width={"50px"} />
                       <dt className="text-sm font-medium text-black">
                         {product?.name}
                       </dt>

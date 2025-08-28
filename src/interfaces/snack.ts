@@ -4,5 +4,6 @@ export interface Snack {
   image?: any,
   address?:any,
   phone?:any,
-  ownerUID?:any
+  ownerUID?:any,
+  description?:any
 }

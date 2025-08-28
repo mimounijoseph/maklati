@@ -3,14 +3,15 @@ import { OrderReview } from "@/components/order-review";
 import { ProductSelection } from "@/components/product-selection";
 import ProtectedPage from "@/components/protectedPage";
 import { Stepper } from "@/components/stepper";
-import { useAuth } from "@/context/useContext";
 import Layout from "@/pages/core/layout";
+import { useRouter } from "next/router";
 import { useState } from "react";
 
 const OrderPage = () => {
+  const router = useRouter();
+  const { id } = router.query;
   const [step, setStep] = useState(1);
-  const { selectedProducts } = useAuth();
-  const [orderConfirmed, setOrderConfirmed] = useState(false);
+
 
   const next = () => setStep((prev) => prev + 1);
   const prev = () => setStep((prev) => prev - 1);
@@ -22,8 +23,8 @@ const OrderPage = () => {
           <h1 className="text-2xl font-bold mt-32 text-center"></h1>
           <Stepper step={step} />
 
-          {step === 1 && <ProductSelection next={next} />}
-          {step === 2 && <OrderReview next={next} prev={prev} />}
+          {step === 1 && <ProductSelection next={next} snackId={id} />}
+          {step === 2 && <OrderReview next={next} prev={prev} snackId={id} />}
           {step === 3 && <OrderConfirmation />}
         </div>
       </ProtectedPage>
