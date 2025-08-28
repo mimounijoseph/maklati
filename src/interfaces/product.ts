@@ -1,10 +1,14 @@
 export interface Plat {
-  id: number;
+  id?: number;
   name: string;
   description: string;
   category: string;
-  size: string;
-  price: number;
+  cost: {
+    price: number;
+    size: string;
+    quantity: number;
+  }[]|[],
+  status: boolean;
   urlPhoto: string;
   snackId?: string;
   createdAt?: Date;
