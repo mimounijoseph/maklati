@@ -2,44 +2,58 @@ import { Snack } from "@/interfaces/snack";
 import CenteredImageCard from "@/components/ui/profilecard";
 import React, { useEffect, useState } from "react";
 import Layout from "../core/layout";
+import { SnackService } from "@/services/snack";
+import { useAuth } from "@/context/useContext";
+import { Loader } from "@/components/ui/loader";
+
+const snackService = new SnackService();
 
 function Menu() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Snack[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<Snack[]>([
-    { name: "snack 1", image: "/snack1.png" },
-    { name: "snack 2", image: "/snack2.jpg" },
-    { name: "snack 3", image: "/snack3.avif" },
-    { name: "snack 4", image: "/snack4.png" },
-  ]);
+  // const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<any[]>([]);
   const [fetchUrl, setFetchUrl] = useState("");
+  const [loading,setLoading]=useState(true)
+  function fetchSnacks(){
+    let data = snackService.getAll().then(response=>{
+      setData(response)
+      setLoading(false)
+    })
+  }
+
+
+  useEffect(()=>{
+    fetchSnacks()
+  },[])
 
   // Fetch depuis une API si URL présente
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!fetchUrl || query.trim() === "") {
-        setResults([]);
-        return;
-      }
+  // useEffect(() => {
+  //   // const fetchData = async () => {
+  //   //   if (!fetchUrl || query.trim() === "") {
+  //   //     setResults([]);
+  //   //     return;
+  //   //   }
 
-      setLoading(true);
-      try {
-        const response = await fetch(`${fetchUrl}?q=${query}`);
-        const json = await response.json();
-        setResults(json);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setResults([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    console.log(filteredData);
+  //   //   setLoading(true);
+  //   //   try {
+  //   //     const response = await fetch(`${fetchUrl}?q=${query}`);
+  //   //     const json = await response.json();
+  //   //     setResults(json);
+  //   //   } catch (err) {
+  //   //     console.error("Error fetching data:", err);
+  //   //     setResults([]);
+  //   //   } finally {
+  //   //     setLoading(false);
+  //   //   }
+  //   // };
+  //   // const debounceTimeout = setTimeout(fetchData, 300); // Debounce
+  //   // return () => clearTimeout(debounceTimeout);
+  // }, [query, fetchUrl]);
 
-    const debounceTimeout = setTimeout(fetchData, 300); // Debounce
-    return () => clearTimeout(debounceTimeout);
-  }, [query, fetchUrl]);
+useEffect(()=>{
+  
+},[query])
 
   // Recherche dans la liste locale
   const filteredData = !fetchUrl
@@ -47,6 +61,21 @@ function Menu() {
         item.name.toLowerCase().includes(query.toLowerCase())
       )
     : results;
+
+
+    if (loading) {
+    return (
+      <Layout>
+      <div className="h-[60vh] flex justify-center items-center">
+        <Loader>
+          <span className="text-black dark:text-white">
+            Getting things ready…
+          </span>
+        </Loader>
+      </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -69,13 +98,14 @@ function Menu() {
           <div className="cursor-pointer">
             <CenteredImageCard
               key={index}
+              id={snack.id}
               img={snack.image}
               name={snack.name}
-              bio="menu variable avec plein de categori là'dans , pizza, tacos, boissons et beaucoup plus"
+              bio={snack.description}
               skills={[]}
               githubUrl={undefined}
               twitterUrl={undefined}
-              position="Berkane centre ville"
+              position={snack.address}
             />
           </div>
         ))}

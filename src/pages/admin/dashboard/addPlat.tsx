@@ -68,7 +68,7 @@ const AddPlat: FC = () => {
 
       const newPlat = {
         ...formData,
-        userId: user.uid,
+        snackId: user.uid, //todo replace userId by snackId because it's more significant
         createdAt: new Date(),
       };
 

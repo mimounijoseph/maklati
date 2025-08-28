@@ -7,15 +7,15 @@ import { useAuth } from "@/context/useContext";
 
 
 type CardTypes = {
-  product?: Product;
+  product?: any;
   isOrderForm?: boolean;
 };
 
 function Card({ product, isOrderForm }: CardTypes) {
   const { selectedProducts, setSelectedProducts } = useAuth();
   const { toast } = useToast();
-  const sizes: any = ["M", "L", "XL"];
-  const [selectedSize, setSelectedSize] = useState(product?.cost[0].type);
+  const [sizes,setSizes]=useState<any[]>([])
+  const [selectedSize, setSelectedSize] = useState(product?.cost[0]?.size);
   const [qty, setQty] = useState(0);
   const [price, setPrice] = useState(product?.cost[0].price);
   const [totalProduct,setTotalProduct] = useState(0)
@@ -37,6 +37,11 @@ function Card({ product, isOrderForm }: CardTypes) {
       duration: 2500,
     });
   }
+
+  useEffect(()=>{
+    let categorys:any = product?.cost.map((e:any)=>e.size);
+    setSizes(categorys);
+  },[])
 
   useEffect(()=>{
      let prod = selectedProducts.find((p:any)=>p.id==product?.id)
@@ -72,7 +77,7 @@ function Card({ product, isOrderForm }: CardTypes) {
       const updatedProducts = selectedProducts.map((p: any) => {
         if (p.id == product?.id) {
           const updatedCost = p.cost.map((e: any) => {
-            if (e.type == selectedSize) {
+            if (e.size == selectedSize) {
               return { ...e, quantity: qty }; // Update the quantity
             }
             return e;
@@ -87,7 +92,7 @@ function Card({ product, isOrderForm }: CardTypes) {
       const newProduct = {
         ...product,
         cost: product?.cost.map((e: any) => {
-          if (e.type == selectedSize) {
+          if (e.size == selectedSize) {
             return { ...e, quantity: qty }; // Initialize quantity for the selected type
           }
           return e;

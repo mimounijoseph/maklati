@@ -5,5 +5,5 @@ export interface Order{
     products:any[],
     total?:any,
     userUID?:any,
-    menuId?:any
+    snackId?:any
 }

@@ -19,6 +19,7 @@ interface Skill {
 }
 
 interface ProfileCardProps {
+  id:any;
   img: string;
   name: string;
   bio: string;
@@ -29,6 +30,7 @@ interface ProfileCardProps {
 }
 
 export default function ProfileCard({
+  id,
   img,
   name,
   bio,
@@ -100,7 +102,7 @@ const router = useRouter();
             layout="fill"
             objectFit="cover"
             onClick={(e) => {
-              router.push('/snack/1')
+              router.push(`/snack/${id}`)
             }}
           />
           <motion.div
