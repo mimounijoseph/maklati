@@ -2,6 +2,8 @@
 @plugin "flowbite-react/plugin/tailwindcss";
 @source "../../.flowbite-react/class-list.json";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -190,6 +192,11 @@ ul{
   display: none;             /* Chrome, Safari, Opera */
 }
 
-.admin-dashboard {
-  font-family: 'Roboto', sans-serif !important;
+
+.admin {
+  font-family: 'Inter', sans-serif !important;
+}
+
+.admin ul{
+  font-family: 'Inter', sans-serif !important;
 }

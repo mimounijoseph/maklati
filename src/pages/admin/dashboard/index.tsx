@@ -5,7 +5,7 @@ import QrCodeGenerator from '@/components/qrcode';
 
 const Index: FC = () => {
   return (
-    <div className="h-full bg-white" style={{fontFamily:'sans-serif'}}>
+    <div className="admin h-full bg-white" style={{fontFamily:'sans-serif'}}>
       <Sidebar />
       <div className="h-screen p-4 sm:ml-64">
         <div className=" mt-14">
