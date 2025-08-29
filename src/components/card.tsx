@@ -120,7 +120,7 @@ function Card({ product, isOrderForm }: CardTypes) {
       <div className="w-full h-full flex flex-col p-4">
         <div className="relative flex items-center justify-center">
           <img
-            src={product?.image ?? "/images.jpg"}
+            src={product.urlPhoto ?? "/images.jpg"}
             alt={product?.name ?? "Product"}
             className="w-full h-48 object-cover rounded-2xl ring-1 ring-slate-200"
           />
