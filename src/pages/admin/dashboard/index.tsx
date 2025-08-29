@@ -1,6 +1,7 @@
 import React, { FC } from "react";
 import Sidebar from "./sidebar";
 import UrlInput from "@/components/urlInput";
+
 import QrCodeGenerator from '@/components/qrcode';
 
 const Index: FC = () => {

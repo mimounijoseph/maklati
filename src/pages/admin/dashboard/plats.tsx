@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import Sidebar from "./sidebar";
 import Spinner from "../../../components/spinner";
+
 import {
   collection,
   getDocs,
@@ -10,12 +11,18 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "../../../config/firebase";
+import PlatModal from "../../../components/PlatModalProps ";
 import { Eye } from "lucide-react";
 
 interface Plat {
   id: number;
   name: string;
   price: number;
+  cost: {
+    price: number;
+    size: string;
+    quantity: number;
+  }[] | [];
   status: boolean;
   urlPhoto: string;
   docId?: string; // Firestore document ID
@@ -25,7 +32,8 @@ const Plats: FC = () => {
   const [plats, setPlats] = useState<Plat[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<number[]>([]);
+  const [selected, setSelected] = useState<string[]>([]); // store docIds
+  const [activeDocId, setActiveDocId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPlats = async () => {
@@ -38,6 +46,7 @@ const Plats: FC = () => {
             id: data.id,
             name: data.name,
             price: data.price,
+            cost: data.cost,
             status: data.status,
             urlPhoto: data.urlPhoto,
             docId: docSnap.id,
@@ -54,9 +63,9 @@ const Plats: FC = () => {
     fetchPlats();
   }, []);
 
-  const toggleSelect = (id: number) => {
+  const toggleSelect = (docId: string) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(docId) ? prev.filter((x) => x !== docId) : [...prev, docId]
     );
   };
 
@@ -64,7 +73,7 @@ const Plats: FC = () => {
     if (selected.length === plats.length) {
       setSelected([]);
     } else {
-      setSelected(plats.map((p) => p.id));
+      setSelected(plats.map((p) => p.docId!));
     }
   };
 
@@ -72,19 +81,18 @@ const Plats: FC = () => {
   const setAvailabilityForSelected = async (available: boolean) => {
     if (selected.length === 0) return;
 
-    // optimistic UI
     const selectedSet = new Set(selected);
     const prevPlats = plats;
     const nextPlats = plats.map((p) =>
-      selectedSet.has(p.id) ? { ...p, status: available } : p
+      selectedSet.has(p.docId!) ? { ...p, status: available } : p
     );
     setPlats(nextPlats);
 
     try {
       const batch = writeBatch(db);
       plats.forEach((p) => {
-        if (selectedSet.has(p.id) && p.docId) {
-          batch.update(doc(db, "plat", p.docId), { status: available });
+        if (selectedSet.has(p.docId!)) {
+          batch.update(doc(db, "plat", p.docId!), { status: available });
         }
       });
       await batch.commit();
@@ -92,23 +100,52 @@ const Plats: FC = () => {
       setDropdownOpen(false);
     } catch (e) {
       console.error("Failed to update availability:", e);
-      // rollback UI if DB update fails
-      setPlats(prevPlats);
+      setPlats(prevPlats); // rollback
+    }
+  };
+
+  // Delete selected plats
+  const deleteSelectedPlats = async () => {
+    if (selected.length === 0) return;
+
+    if (!window.confirm("Are you sure you want to delete the selected plats?")) {
+      return;
+    }
+
+    const selectedSet = new Set(selected);
+    const prevPlats = plats;
+    const nextPlats = plats.filter((p) => !selectedSet.has(p.docId!));
+    setPlats(nextPlats);
+
+    try {
+      const batch = writeBatch(db);
+      selected.forEach((docId) => {
+        batch.delete(doc(db, "plat", docId));
+      });
+      await batch.commit();
+      setSelected([]);
+      setDropdownOpen(false);
+    } catch (e) {
+      console.error("Failed to delete plats:", e);
+      setPlats(prevPlats); // rollback
     }
   };
 
   return (
-    <div className="admin min-h-full bg-gray-50 " style={{ fontFamily: "sans-serif" }}>
+    <div className="admin" style={{ fontFamily: "sans-serif" }}>
       <Sidebar />
-      <div className="sm:ml-64">
-        <div className="p-4 dark:border-gray-700 mt-14 ">
+      <div className="bg-gray-50 sm:ml-64">
+        <div className="min-h-screen p-8 dark:border-gray-700 mt-14">
+          {/* Page Header */}
           <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-gray-800">Add New Plat</h1>
-            <p className="text-gray-500 text-sm">Fill in the details below to create a new plat.</p>
+            <h1 className="text-2xl font-semibold text-gray-800">Plats</h1>
+            <p className="text-gray-500 text-sm">
+              Manage your plats below.
+            </p>
           </div>
-          <div className="bg-white overflow-x-auto  sm:rounded-lg rounded-2xl shadow-lg border border-gray-100 p-8 space-y-8 max-w-4xl mx-auto relative">
+          <div className="bg-white overflow-x-auto rounded-2xl shadow-lg border border-gray-100 p-4 space-y-8 mx-auto relative mt-10">
             {/* Top bar */}
-            <div className=" flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900 p-4">
+            <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900 p-4">
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen((prev) => !prev)}
@@ -140,8 +177,10 @@ const Plats: FC = () => {
                         <button
                           onClick={() => setAvailabilityForSelected(true)}
                           disabled={selected.length === 0}
-                          className={`w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${
-                            selected.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+                          className={`w-full text-sm text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${
+                            selected.length === 0
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
                           }`}
                         >
                           Set Available
@@ -151,11 +190,26 @@ const Plats: FC = () => {
                         <button
                           onClick={() => setAvailabilityForSelected(false)}
                           disabled={selected.length === 0}
-                          className={`w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${
-                            selected.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+                          className={`w-full text-sm text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${
+                            selected.length === 0
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
                           }`}
                         >
                           Set Unavailable
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          onClick={deleteSelectedPlats}
+                          disabled={selected.length === 0}
+                          className={`w-full text-sm text-left px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-gray-600 dark:hover:text-red-400 ${
+                            selected.length === 0
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                        >
+                          Delete Plat
                         </button>
                       </li>
                     </ul>
@@ -202,7 +256,9 @@ const Plats: FC = () => {
                     <div className="flex items-center">
                       <input
                         type="checkbox"
-                        checked={selected.length === plats.length && plats.length > 0}
+                        checked={
+                          selected.length === plats.length && plats.length > 0
+                        }
                         onChange={toggleAll}
                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500"
                       />
@@ -233,14 +289,14 @@ const Plats: FC = () => {
                 </tfoot>
               ) : (
                 plats.map((plat) => (
-                  <tbody key={plat.id}>
+                  <tbody key={plat.docId}>
                     <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                       <td className="w-4 p-4">
                         <div className="flex items-center">
                           <input
                             type="checkbox"
-                            checked={selected.includes(plat.id)}
-                            onChange={() => toggleSelect(plat.id)}
+                            checked={selected.includes(plat.docId!)}
+                            onChange={() => toggleSelect(plat.docId!)}
                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500"
                           />
                         </div>
@@ -255,7 +311,9 @@ const Plats: FC = () => {
                           alt={plat.name}
                         />
                         <div className="ps-3">
-                          <div className="text-base font-semibold">{plat.name}</div>
+                          <div className="text-base font-semibold">
+                            {plat.name}
+                          </div>
                         </div>
                       </th>
                       <td className="px-6 py-4">${plat.price}</td>
@@ -270,9 +328,12 @@ const Plats: FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <button className="text-blue-600 dark:text-blue-500 hover:underline">
-                          <Eye className="w-5 h-5" />
-                        </button>
+                          <button
+                            className="text-blue-600 dark:text-blue-500 hover:underline"
+                            onClick={() => setActiveDocId(plat.docId!)}
+                          >
+                            <Eye className="w-5 h-5" />
+                          </button>
                       </td>
                     </tr>
                   </tbody>
@@ -282,6 +343,15 @@ const Plats: FC = () => {
           </div>
         </div>
       </div>
+              {activeDocId && (
+          <PlatModal
+            docId={activeDocId}
+            onClose={() => setActiveDocId(null)}
+            onDeleted={(deletedId) => {
+              setPlats((prev) => prev.filter((p) => p.docId !== deletedId));
+            }}
+          />
+        )}
     </div>
   );
 };
