@@ -55,6 +55,7 @@ export default function Home() {
             borderRadius="100px"
             background="transparent"
             placeholder="Start now"
+            onClick={()=>window.location.href="/snack"}
           />
         </div>
         <img src="hero_img.png" alt="burger" width="500px" />

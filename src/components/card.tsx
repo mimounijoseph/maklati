@@ -63,7 +63,7 @@ function Card({ product, isOrderForm }: CardTypes) {
 
   function toggleSize(s: any): void {
     setSelectedSize(s);
-    let price = product?.cost.find((e: any) => e.type == s)?.price;
+    let price = product?.cost.find((e: any) => e.size == s)?.price;
     setPrice(price);
   }
 
