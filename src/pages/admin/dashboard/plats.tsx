@@ -311,7 +311,7 @@ const Plats: FC = () => {
                           alt={plat.name}
                         />
                         <div className="ps-3">
-                          <div className="text-base font-semibold">
+                          <div className="text-base font-semibold text-center">
                             {plat.name}
                           </div>
                         </div>
@@ -320,7 +320,7 @@ const Plats: FC = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           <div
-                            className={`h-2.5 w-2.5 rounded-full me-2 ${
+                            className={`h-2.5 w-2.5 rounded-full me-2 text-center ${
                               plat.status ? "bg-green-500" : "bg-red-500"
                             }`}
                           />
