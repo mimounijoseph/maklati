@@ -167,7 +167,7 @@ const PlatModal: FC<PlatModalProps> = ({ docId, onClose, onDeleted }) => {
         <div className="flex justify-between items-center border-t p-6">
           <div className="flex gap-3">
             <button className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow transition">
-              Edit
+              <a href={`/admin/dashboard/editePlat/${docId}`}>Edit</a>
             </button>
             <button className="px-5 py-2.5 text-sm font-medium border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
               Preview

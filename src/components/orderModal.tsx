@@ -108,8 +108,8 @@ const OrderModal: FC<OrderModalProps> = ({ docId, onClose, onDeleted }) => {
                     <span className="font-semibold">Vendor:</span>{" "}
                     {order.snackId}
                   </p>
-                  <p className="text-xl font-bold mt-2">
-                    Total: ${order.total}
+                  <p className="text-xl font-bold mt-2 text-gray-950">
+                    Total:  {order.total} MAD
                   </p>
                 </div>
 
@@ -146,12 +146,12 @@ const OrderModal: FC<OrderModalProps> = ({ docId, onClose, onDeleted }) => {
                               {product.cost.map((c, i) => (
                                 <li
                                   key={i}
-                                  className="flex justify-between text-sm bg-white/50 dark:bg-gray-700/50 px-3 py-1 rounded"
+                                  className="flex justify-between text-sm text-gray-950 bg-white/50 dark:bg-gray-700/50 px-3 py-1 rounded"
                                 >
                                   <span>
                                     {c.size} × {c.quantity}
                                   </span>
-                                  <span>${c.price}</span>
+                                  <span>{c.price} MAD</span>
                                 </li>
                               ))}
                             </ul>

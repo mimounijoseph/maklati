@@ -3,15 +3,17 @@ import Sidebar from "./sidebar";
 import UrlInput from "@/components/urlInput";
 
 import QrCodeGenerator from '@/components/qrcode';
+// import RevenueChart from "@/components/dashboard/ordersChart";
 
 const Index: FC = () => {
   return (
-    <div className="admin h-full bg-white" style={{fontFamily:'sans-serif'}}>
+    <div className="admin bg-white" style={{fontFamily:'sans-serif'}}>
       <Sidebar />
-      <div className="h-screen p-4 sm:ml-64">
+      <div className="min-h-screen  p-4 sm:ml-64">
         <div className=" mt-14">
-            <UrlInput/>
-              <QrCodeGenerator menuId="123" />
+            {/* <UrlInput/>
+              <QrCodeGenerator menuId="123" /> */}
+              {/* <RevenueChart/> */}
         </div>
       </div>
     </div>

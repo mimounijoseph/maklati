@@ -10,7 +10,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "../../../config/firebase";
-import OrderModal from "../../../components/OrderModal";
+import OrderModal from "../../../components/orderModal";
 import { Eye } from "lucide-react";
 
 interface Product {
