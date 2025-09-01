@@ -77,7 +77,7 @@ const OrderModal: FC<OrderModalProps> = ({ docId, onClose, onDeleted }) => {
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            className="p-2 text-gray-900 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
           >
             ✕
           </button>

@@ -1,9 +1,10 @@
+"use client"; 
 import React, { FC } from "react";
 import Sidebar from "./sidebar";
 import UrlInput from "@/components/urlInput";
 
 import QrCodeGenerator from '@/components/qrcode';
-// import RevenueChart from "@/components/dashboard/ordersChart";
+import OrderChart from "@/components/dashboard/ordersChart";
 
 const Index: FC = () => {
   return (
@@ -13,7 +14,7 @@ const Index: FC = () => {
         <div className=" mt-14">
             {/* <UrlInput/>
               <QrCodeGenerator menuId="123" /> */}
-              {/* <RevenueChart/> */}
+              <OrderChart/>
         </div>
       </div>
     </div>
