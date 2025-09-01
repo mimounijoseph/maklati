@@ -109,7 +109,7 @@ function Card({ product, isOrderForm }: CardTypes) {
     );
   }
 
-  return (
+  if(product.status) return (
     <SpotlightCard
       className={`w-80 rounded-2xl bg-white/70 backdrop-blur-md
               ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(17,24,39,0.12)]
