@@ -9,11 +9,16 @@ const OrdersChart = () => {
 
   useEffect(() => {
     const fetchDataAndRenderChart = async () => {
-      const ordersQuery = query(collection(db, "orders"), orderBy("date", "asc"));
+      const ordersQuery = query(
+        collection(db, "orders"),
+        orderBy("date", "asc")
+      );
       const snapshot = await getDocs(ordersQuery);
+      if (snapshot.empty) return;
 
       let total = 0;
-      const seriesData: { x: number; y: number }[] = [];
+      const ordersByDate: Record<string, number> = {};
+      const allDaysSet = new Set<string>();
 
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -27,73 +32,86 @@ const OrdersChart = () => {
 
         total += 1;
 
-        // Push the order as a point in time
-        seriesData.push({
-          x: date.getTime(), // timestamp (ms)
-          y: 1,              // always 1 order per event
-        });
+        const dayStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
+        ordersByDate[dayStr] = (ordersByDate[dayStr] || 0) + 1;
+
+        // Get day of week
+        const weekday = date.toLocaleDateString("en-US", { weekday: "short" }); // e.g., Mon, Tue
+        allDaysSet.add(weekday);
       });
 
       setTotalOrders(total);
+
+      // Build series based on all weekdays found
+      const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      const seriesData: { x: string; y: number }[] = [];
+
+      weekdays.forEach((day) => {
+        let totalForDay = 0;
+        // Sum all orders matching this weekday
+        Object.keys(ordersByDate).forEach((dateStr) => {
+          const date = new Date(dateStr);
+          const weekdayStr = date.toLocaleDateString("en-US", { weekday: "short" });
+          if (weekdayStr === day) {
+            totalForDay += ordersByDate[dateStr];
+          }
+        });
+        seriesData.push({ x: day, y: totalForDay });
+      });
 
       const ApexCharts = (await import("apexcharts")).default;
 
       const options = {
         chart: {
           type: "area",
-          height: 180,
+          height: 200,
           width: "100%",
           fontFamily: "Inter, sans-serif",
           toolbar: { show: false },
+          animations: { enabled: true, easing: "easeout", speed: 600 },
         },
         series: [
           {
             name: "Orders",
             data: seriesData,
-            color: "#8B5CF6", // purple like Shopify
           },
         ],
+        stroke: { curve: "smooth", width: 3 },
+        fill: {
+          type: "gradient",
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.3,
+            opacityTo: 0,
+            stops: [0, 90, 100],
+            colorStops: [
+              { offset: 0, color: "#8B5CF6", opacity: 0.5 },
+              { offset: 100, color: "#8B5CF6", opacity: 0 },
+            ],
+          },
+        },
         xaxis: {
-          type: "datetime",
+          type: "category",
           labels: {
-            datetimeUTC: false,
-            style: {
-              fontFamily: "Inter, sans-serif",
-              cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
-            },
+            style: { fontSize: "12px", colors: "#9CA3AF" },
           },
           axisBorder: { show: false },
           axisTicks: { show: false },
         },
         yaxis: {
           min: 0,
-          max: 10, // always fixed from 0 → 10
-          tickAmount: 5,
-          labels: {
-            formatter: (val: number) => `${val}`,
-            style: {
-              fontFamily: "Inter, sans-serif",
-              cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
-            },
-          },
+          labels: { style: { fontSize: "12px", colors: "#9CA3AF" } },
         },
-        stroke: { width: 2 },
-        fill: {
-          type: "gradient",
-          gradient: {
-            opacityFrom: 0.5,
-            opacityTo: 0,
-            shade: "#8B5CF6",
-            gradientToColors: ["#8B5CF6"],
-          },
-        },
-        dataLabels: { enabled: false },
-        grid: { show: true, borderColor: "#E5E7EB" },
+        grid: { show: true, borderColor: "#E5E7EB", strokeDashArray: 3 },
         tooltip: { enabled: true },
+        markers: { size: 0 },
         legend: { show: false },
       };
 
-      const chart = new ApexCharts(document.getElementById("orders-chart"), options);
+      const chart = new ApexCharts(
+        document.getElementById("orders-chart"),
+        options
+      );
       chart.render();
     };
 
@@ -101,23 +119,17 @@ const OrdersChart = () => {
   }, []);
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="flex justify-between p-4 pb-2">
+    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <div className="flex justify-between mb-2">
         <div>
-          <h5 className="leading-none text-3xl font-bold text-gray-900 dark:text-white">
-            {totalOrders}
-          </h5>
-          <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
-            ORDERS OVER TIME
-          </p>
+          <h5 className="text-3xl font-bold text-gray-900">{totalOrders}</h5>
+          <p className="text-sm text-gray-500">Orders Over Time</p>
         </div>
         <a href="#" className="text-sm font-medium text-blue-600">
           View report
         </a>
       </div>
-
-      {/* Chart */}
-      <div id="orders-chart" className="w-full h-48 px-2.5"></div>
+      <div id="orders-chart" className="w-full h-48"></div>
     </div>
   );
 };

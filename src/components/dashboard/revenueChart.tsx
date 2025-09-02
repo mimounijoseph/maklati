@@ -1,27 +1,25 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, getDocs,  query, orderBy  } from "firebase/firestore";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "@/config/firebase";
 
 const RevenueChart = () => {
-  const [revenueData, setRevenueData] = useState<number[]>([]);
-  const [labels, setLabels] = useState<string[]>([]);
   const [totalRevenue, setTotalRevenue] = useState<number>(0);
 
   useEffect(() => {
     const fetchDataAndRenderChart = async () => {
       const ordersQuery = query(collection(db, "orders"), orderBy("date", "asc"));
-        const snapshot = await getDocs(ordersQuery);
-      const totals: number[] = [];
-      const dates: string[] = [];
-      let totalSum = 0;
+      const snapshot = await getDocs(ordersQuery);
+      if (snapshot.empty) return;
+
+      let total = 0;
+      const revenueByDate: Record<string, number> = {};
 
       snapshot.forEach((doc) => {
         const data = doc.data();
-        const total = data.total || 0;
-        totals.push(total);
-        totalSum += total;
+        const revenue = data.total || 0;
+        total += revenue;
 
         let date: Date;
         if (data.date?.seconds) {
@@ -30,61 +28,73 @@ const RevenueChart = () => {
           date = new Date(data.date);
         }
 
-        // Format date like '01 Feb', '02 Feb', etc.
-        const formattedDate = date
-          .toLocaleDateString("en-US", { day: "2-digit", month: "short" })
-          .replace(",", "");
-        dates.push(formattedDate);
+        const dayStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
+        revenueByDate[dayStr] = (revenueByDate[dayStr] || 0) + revenue;
       });
 
-      setRevenueData(totals);
-      setLabels(dates);
-      setTotalRevenue(totalSum);
+      setTotalRevenue(total);
 
-      // Import ApexCharts dynamically
+      // Build series with formatted days
+      const seriesData: { x: string; y: number }[] = [];
+      Object.keys(revenueByDate)
+        .sort()
+        .forEach((dateStr) => {
+          const date = new Date(dateStr);
+          const formatted = date.toLocaleDateString("en-US", {
+            day: "2-digit",
+            month: "short",
+          });
+          seriesData.push({ x: formatted, y: revenueByDate[dateStr] });
+        });
+
       const ApexCharts = (await import("apexcharts")).default;
 
       const options = {
         chart: {
           type: "area",
-          height: 150,
+          height: 200,
           width: "100%",
           fontFamily: "Inter, sans-serif",
           toolbar: { show: false },
+          animations: { enabled: true, easing: "easeout", speed: 600 },
         },
-        series: [{ name: "Revenue", data: totals, color: "#1A56DB" }],
-        xaxis: {
-          categories: dates,
-          labels: {
-            style: {
-              fontFamily: "Inter, sans-serif",
-              cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
-            },
+        series: [{ name: "Revenue", data: seriesData }],
+        stroke: { curve: "smooth", width: 3 },
+        fill: {
+          type: "gradient",
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.3,
+            opacityTo: 0,
+            stops: [0, 90, 100],
+            colorStops: [
+              { offset: 0, color: "#1A56DB", opacity: 0.5 },
+              { offset: 100, color: "#1A56DB", opacity: 0 },
+            ],
           },
+        },
+        xaxis: {
+          type: "category",
+          labels: { style: { fontSize: "12px", colors: "#9CA3AF" } },
           axisBorder: { show: false },
           axisTicks: { show: false },
         },
         yaxis: {
+          min: 0,
           labels: {
-            formatter: (val: number) => `$${val}`,
-            style: {
-              fontFamily: "Inter, sans-serif",
-              cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
-            },
+            style: { fontSize: "12px", colors: "#9CA3AF" },
+            formatter: (val: number) => `$${val.toFixed(0)}`,
           },
         },
-        fill: {
-          type: "gradient",
-          gradient: { opacityFrom: 0.55, opacityTo: 0, shade: "#1C64F2", gradientToColors: ["#1C64F2"] },
-        },
-        dataLabels: { enabled: false },
-        stroke: { width: 3 },
+        grid: { show: true, borderColor: "#E5E7EB", strokeDashArray: 3 },
+        tooltip: { enabled: true },
+        markers: { size: 0 },
         legend: { show: false },
-        grid: { show: false },
-        tooltip: { enabled: true, x: { show: false } },
       };
 
-      const chart = new ApexCharts(document.getElementById("labels-chart"), options);
+      const chartEl = document.getElementById("revenue-chart");
+      if (chartEl) chartEl.innerHTML = ""; // reset before render
+      const chart = new ApexCharts(chartEl, options);
       chart.render();
     };
 
@@ -92,42 +102,20 @@ const RevenueChart = () => {
   }, []);
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm dark:bg-gray-800">
-  <div className="flex justify-between p-4 md:p-6 pb-2">
-    <div>
-      <h5 className="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">
-        ${totalRevenue}
-      </h5>
-      <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-        Sales this week
-      </p>
+    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <div className="flex justify-between mb-2">
+        <div>
+          <h5 className="text-3xl font-bold text-gray-900">
+            ${totalRevenue.toFixed(2)}
+          </h5>
+          <p className="text-sm text-gray-500">Revenue Over Time</p>
+        </div>
+        <a href="#" className="text-sm font-medium text-blue-600">
+          View report
+        </a>
+      </div>
+      <div id="revenue-chart" className="w-full h-48"></div>
     </div>
-    <div className="flex items-center px-2.5 py-0.5 text-base font-semibold text-green-500 dark:text-green-500 text-center">
-      23%
-      <svg
-        className="w-3 h-3 ms-1"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 10 14"
-      >
-        <path
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M5 13V1m0 0L1 5m4-4 4 4"
-        />
-      </svg>
-    </div>
-  </div>
-
-  {/* Chart below the top stats */}
-  <div id="labels-chart" className="w-full px-2.5 h-48"></div>
-
-
-</div>
-
   );
 };
 
