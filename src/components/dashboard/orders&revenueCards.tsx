@@ -56,7 +56,7 @@ const RevenueOrdersCards = () => {
       {cards.map((card, idx) => (
         <div
           key={idx}
-          className="flex flex-col justify-center items-start p-6 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition"
+          className="flex flex-col justify-center items-start p-6 bg-white rounded-lg shadow-sm border border-gray-20 hover:shadow-lg transition"
         >
           <p className="text-sm text-gray-500">{card.title}</p>
           <h3 className="mt-2 text-2xl font-semibold text-gray-900">
