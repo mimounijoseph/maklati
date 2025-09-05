@@ -1,6 +1,17 @@
-import React, { FC } from "react";
-   
+import NotificationDropdown from "@/components/adminNotecfication";
+import NewOrderAlert from "@/components/newOrderalert"; // ✅ import alert
+import React, { FC, useState } from "react";
+
+
+
 const Sidebar: FC = () => {
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
+  // 🔑 This function will be called by NotificationDropdown when a new order arrives
+  const handleNewOrder = (message: string) => {
+    setAlertMessage(message);
+    setTimeout(() => setAlertMessage(null), 5000); // auto-hide after 5s
+  };
   return (
     <div className="admin" style={{fontFamily: 'sans-serif'}}>
       <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
@@ -23,26 +34,30 @@ const Sidebar: FC = () => {
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    clip-rule="evenodd"
-                    fill-rule="evenodd"
+                    clipRule="evenodd"
+                    fillRule="evenodd"
                     d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
                   ></path>
                 </svg>
               </button>
               <a href="/" className="flex ms-2 md:me-24">
-                {/* <img
-                  src="https://flowbite.com/docs/images/logo.svg"
-                  className="h-8 me-3"
-                  alt="FlowBite Logo"
-                /> */}
                 <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-gray-950 ">
                   Maklati
                 </span>
               </a>
             </div>
-                {/* admin profile here */}
+
+            {/* 🔔 Pass callback so dropdown can trigger alert */}
+            <NotificationDropdown onNewOrder={handleNewOrder} />
           </div>
         </div>
+
+        {/* ✅ Alert placed directly under navbar */}
+        {alertMessage && (
+          <div className="absolute left-0 w-full flex justify-center mt-2 px-4">
+            <NewOrderAlert message={alertMessage} />
+          </div>
+        )}
       </nav>
 
       <aside

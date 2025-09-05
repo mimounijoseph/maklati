@@ -16,6 +16,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "firebase": "^12.1.0",
+    "firebase-admin": "^13.5.0",
     "flowbite": "^3.1.2",
     "flowbite-react": "^0.12.7",
     "framer-motion": "^12.23.12",
