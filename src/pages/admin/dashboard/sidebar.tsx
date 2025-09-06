@@ -1,5 +1,5 @@
 import NotificationDropdown from "@/components/adminNotecfication";
-import NewOrderAlert from "@/components/newOrderalert"; // ✅ import alert
+import NewOrderAlert from "@/components/alerts/newOrderalert"; // ✅ import alert
 import React, { FC, useState } from "react";
 
 
@@ -10,7 +10,8 @@ const Sidebar: FC = () => {
   // 🔑 This function will be called by NotificationDropdown when a new order arrives
   const handleNewOrder = (message: string) => {
     setAlertMessage(message);
-    setTimeout(() => setAlertMessage(null), 5000); // auto-hide after 5s
+    // setTimeout(() => setAlertMessage(null), 5000); // auto-hide after 5s
+    setAlertMessage(null)
   };
   return (
     <div className="admin" style={{fontFamily: 'sans-serif'}}>

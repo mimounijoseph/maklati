@@ -1,8 +1,8 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
 import { db } from "../config/firebase";
-import { collection, query, orderBy, onSnapshot, DocumentData } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 
 type Notification = {
   orderId: string;
@@ -13,6 +13,7 @@ type Notification = {
   read: boolean;
   type: string;
 };
+
 type NotificationDropdownProps = {
   onNewOrder?: (message: string) => void;
 };
@@ -20,12 +21,12 @@ type NotificationDropdownProps = {
 const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder }) => {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const isInitialLoad = useRef(true); // 🔑 track initial snapshot
 
   useEffect(() => {
     const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      // Handle new/modified/removed docs
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
           const newNotif = {
@@ -35,17 +36,17 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
               : new Date(),
           } as Notification;
 
-          // ✅ Play sound only for new order notifications
-          if (newNotif.type === "order") {
+          // ✅ Only trigger sound + alert after initial load
+          if (!isInitialLoad.current && newNotif.type === "order") {
             const audio = new Audio("/sounds/cashier.mp3");
             audio.play().catch((err) => console.error("Sound error:", err));
 
-            // ✅ Trigger parent alert
             onNewOrder?.(newNotif.message);
           }
 
           setNotifications((prev) => [newNotif, ...prev]);
         }
+
         if (change.type === "modified") {
           setNotifications((prev) =>
             prev.map((n) =>
@@ -60,12 +61,18 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
             )
           );
         }
+
         if (change.type === "removed") {
           setNotifications((prev) =>
             prev.filter((n) => n.orderId !== change.doc.data().orderId)
           );
         }
       });
+
+      // 🔑 After first snapshot, mark as loaded
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+      }
     });
 
     return () => unsubscribe();
