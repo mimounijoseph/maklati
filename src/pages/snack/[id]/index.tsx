@@ -17,11 +17,13 @@ function Products() {
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   function updateProductsDisplay() {
-    let data = products.filter((p: any) => p?.category == selectedCategory);
+    let data = products?.filter((p: any) => p?.category == selectedCategory);
     setFilteredProducts(data);
   }
 
   function fetchProducts() {
+    console.log(id);
+    
     let data = productService.getBySnackId(id).then((response: any) => {
       setProducts(response);
       // updateProductsDisplay();
@@ -207,7 +209,7 @@ function Products() {
         </div>
 
         <div className="flex gap-4 justify-center items-center flex-wrap">
-          {filteredProducts.map((product, index) => (
+          {filteredProducts?.map((product, index) => (
             <Card key={product.id} isOrderForm={false} product={product} />
           ))}
         </div>
