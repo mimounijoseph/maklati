@@ -33,41 +33,56 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
     snackId: snackId,
   });
 
-  async function addOrder() {
-    try {
-      const ordersRef = collection(db, "orders");
+    async function addOrder() {
+      try {
+        const ordersRef = collection(db, "orders");
 
-      // Étape 1 : Récupérer le dernier document par order décroissant sur le champ `number`
-      const q = query(ordersRef, orderBy("number", "desc"), limit(1));
-      const querySnapshot = await getDocs(q);
+        // Étape 1 : Récupérer le dernier document par order décroissant sur le champ `number`
+        const q = query(ordersRef, orderBy("number", "desc"), limit(1));
+        const querySnapshot = await getDocs(q);
 
-      let newNumber = 0;
-      if (!querySnapshot.empty) {
-        const lastOrder = querySnapshot.docs[0].data();
-        newNumber = lastOrder.number + 1;
-      } else {
-        newNumber = 1;
+        let newNumber = 0;
+        if (!querySnapshot.empty) {
+          const lastOrder = querySnapshot.docs[0].data();
+          newNumber = lastOrder.number + 1;
+        } else {
+          newNumber = 1;
+        }
+
+        // Étape 2 : Créer le nouveau document avec `number`
+        const newOrder = {
+          ...formData,
+          products: selectedProducts,
+          total: total,
+          userUID: auth.currentUser?.uid,
+          number: newNumber,
+        };
+
+        // ✅ Ajouter la commande
+        const docRef = await addDoc(ordersRef, newOrder);
+
+        showToast(
+          "Confirmed",
+          "Your order will be prepared as soon as possible 😊",
+          "success"
+        );
+
+        // ✅ Créer la notification directement dans Firestore
+        await addDoc(collection(db, "notifications"), {
+          orderId: docRef.id, // ID du document de la commande
+          restaurantId: newOrder.snackId,
+          title: `New Order #${newOrder.number}`,
+          message: `${auth.currentUser?.displayName || "Client"} ordered, total: ${newOrder.total}`,
+          createdAt: new Date(), // serveur local timestamp
+          read: false,
+          type: "order",
+        });
+
+      } catch (error) {
+        console.error("Error adding order: ", error);
       }
-
-      // Étape 2 : Créer le nouveau document avec `number`
-      const newOrder = {
-        ...formData,
-        products: selectedProducts,
-        total: total,
-        userUID: auth.currentUser?.uid,
-        number: newNumber,
-      };
-
-      await addDoc(ordersRef, newOrder);
-      showToast(
-        "Confirmed",
-        "Your order will be prepared as soon as possible 😊",
-        "success"
-      );
-    } catch (error) {
-      console.error("Error adding order: ", error);
     }
-  }
+
 
   function showToast(
     title: string,

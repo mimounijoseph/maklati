@@ -149,7 +149,7 @@ const Plats: FC = () => {
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen((prev) => !prev)}
-                  className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                  className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 cursor-pointer"
                   type="button"
                 >
                   Action
@@ -329,7 +329,7 @@ const Plats: FC = () => {
                       </td>
                       <td className="px-6 py-4">
                           <button
-                            className="text-blue-600 dark:text-blue-500 hover:underline"
+                            className="text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
                             onClick={() => setActiveDocId(plat.docId!)}
                           >
                             <Eye className="w-5 h-5" />
