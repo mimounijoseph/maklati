@@ -37,9 +37,9 @@ const Snack: FC = () => {
                Download the QR code and paste it on your restaurant tables.
             </small>
           </div>
-          <button>
+          {/* <button>
             downloed Qr
-          </button>
+          </button> */}
           </div>
         </div>
         </div>

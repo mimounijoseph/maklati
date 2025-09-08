@@ -3,8 +3,7 @@ import React, { FC, useEffect, useState } from "react";
 
 import { db } from "@/config/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { Button, Card, Label, TextInput, Textarea } from "flowbite-react";
-import { Spinner } from "flowbite-react";
+import { Button, Card, Label, TextInput, Textarea, Spinner } from "flowbite-react";
 
 type Snack = {
   name: string;
@@ -62,91 +61,79 @@ const SnackInfo: FC = () => {
   }
 
   return (
+    <div className="">
+      <Card className="mx-auto shadow-md">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Snack Information</h2>
 
-      <div className="">
-        <Card className=" mx-auto shadow-md">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Snack Information</h2>
-
-          <div className="space-y-4">
-            {/* Snack Image */}
-            {/* {snack?.image && (
-              <div className="flex justify-center mb-6">
-                <img
-                  src={snack.image}
-                  alt="Snack"
-                  className="rounded-xl shadow-lg max-h-60"
-                />
-              </div>
-            )} */}
-
-            {/* Name */}
-            <div>
-              <Label htmlFor="name" />
-              <TextInput
-                id="name"
-                value={snack?.name || ""}
-                onChange={(e) => setSnack({ ...snack!, name: e.target.value })}
-                required
-              />
-            </div>
-
-            {/* Description */}
-            <div>
-              <Label htmlFor="description"  />
-              <Textarea
-                id="description"
-                value={snack?.description || ""}
-                onChange={(e) =>
-                  setSnack({ ...snack!, description: e.target.value })
-                }
-                rows={3}
-                required
-              />
-            </div>
-
-            {/* Phone */}
-            <div>
-              <Label htmlFor="phone"  />
-              <TextInput
-                id="phone"
-                value={snack?.phone || ""}
-                onChange={(e) => setSnack({ ...snack!, phone: e.target.value })}
-                required
-              />
-            </div>
-
-            {/* Address */}
-            <div>
-              <Label htmlFor="address"  />
-              <TextInput
-                id="address"
-                value={snack?.address || ""}
-                onChange={(e) => setSnack({ ...snack!, address: e.target.value })}
-                required
-              />
-            </div>
-
-            {/* Save Button */}
-            <div className="flex justify-end">
-            <Button
-            onClick={handleUpdate}
-            color="green"
-            disabled={saving}
-            >
-            {saving ? (
-                <div className="flex items-center gap-2">
-                <Spinner size="sm" light={true} />
-                Saving...
-                </div>
-            ) : (
-                "Save Changes"
-            )}
-            </Button>
-
-            </div>
+        <div className="space-y-4">
+          {/* Name */}
+          <div>
+            <Label htmlFor="name">Name</Label>
+            <TextInput
+              id="name"
+              value={snack?.name || ""}
+              onChange={(e) => setSnack({ ...snack!, name: e.target.value })}
+              required
+            />
           </div>
-        </Card>
-      </div>
+
+          {/* Description */}
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={snack?.description || ""}
+              onChange={(e) =>
+                setSnack({ ...snack!, description: e.target.value })
+              }
+              rows={3}
+              required
+            />
+          </div>
+
+          {/* Phone */}
+          <div>
+            <Label htmlFor="phone">Phone</Label>
+            <TextInput
+              id="phone"
+              value={snack?.phone || ""}
+              onChange={(e) => setSnack({ ...snack!, phone: e.target.value })}
+              required
+            />
+          </div>
+
+          {/* Address */}
+          <div>
+            <Label htmlFor="address">Address</Label>
+            <TextInput
+              id="address"
+              value={snack?.address || ""}
+              onChange={(e) => setSnack({ ...snack!, address: e.target.value })}
+              required
+            />
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-end">
+            <Button
+              className="bg-orange-500 hover:bg-orange-600"
+              onClick={handleUpdate}
+              color="green"
+              disabled={saving}
+            >
+              {saving ? (
+                <div className="flex items-center gap-2">
+                  <Spinner size="sm" light={true} />
+                  Saving...
+                </div>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 };
 
