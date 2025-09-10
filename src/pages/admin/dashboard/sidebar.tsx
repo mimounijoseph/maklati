@@ -1,5 +1,6 @@
 import NotificationDropdown from "@/components/adminNotecfication";
 import NewOrderAlert from "@/components/alerts/newOrderalert"; // ✅ import alert
+import SearchBar from "@/components/dahboard-search-bar";
 import React, { FC, useState } from "react";
 
 
@@ -47,9 +48,14 @@ const Sidebar: FC = () => {
                 </span>
               </a>
             </div>
+            <div>
+              {/* <SearchBar onSearch={(q) => console.log("Search query:", q)} placeholder="Search snacks..." /> */}
+            </div>
+            <div>
+              {/* 🔔 Pass callback so dropdown can trigger alert */}
+              <NotificationDropdown onNewOrder={handleNewOrder} />
+            </div>
 
-            {/* 🔔 Pass callback so dropdown can trigger alert */}
-            <NotificationDropdown onNewOrder={handleNewOrder} />
           </div>
         </div>
 
