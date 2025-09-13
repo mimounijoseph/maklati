@@ -331,7 +331,7 @@ const Plats: FC = () => {
                           </div>
                         </div>
                       </th>
-                      <td className="px-6 py-4">${plat.price}</td>
+                      <td className="px-6 py-4"><p className=" w-12 border border-gray-200 rounded-md py-1 text-center text-gray-800 ">${plat.cost[0].price}</p></td>
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           <div
@@ -371,7 +371,7 @@ const Plats: FC = () => {
                   onClick={() => setCurrentPage(i + 1)}
                   className={`px-3 py-1 border rounded ${
                     currentPage === i + 1
-                      ? "bg-blue-500 text-white"
+                      ? "border-2 border-orange-500 text-gray-900"
                       : "bg-white"
                   }`}
                 >

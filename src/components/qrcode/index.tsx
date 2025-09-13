@@ -18,7 +18,17 @@ const QrCodeGenerator: React.FC<QrCodeGeneratorProps> = ({ menuId = "1" }) => {
   const downloadImage = async () => {
     if (ref.current === null) return;
     try {
-      const dataUrl = await toPng(ref.current);
+      const dataUrl = await toPng(ref.current, {
+        cacheBust: true,
+        skipFonts: true, // ✅ avoid reading cross-origin cssRules
+        filter: (node) => {
+          if (node.tagName === "STYLE" || node.tagName === "LINK") {
+            return false;
+          }
+          return true;
+        },
+      });
+
       const link = document.createElement("a");
       link.download = `menu-${menuId}-qrcode.png`;
       link.href = dataUrl;
@@ -34,6 +44,7 @@ const QrCodeGenerator: React.FC<QrCodeGeneratorProps> = ({ menuId = "1" }) => {
       <div
         ref={ref}
         className="flex flex-col justify-center items-center border border-gray-100 rounded-md shadow-md p-4 bg-white"
+        style={{ backgroundColor: "white" }} // ✅ ensure white background inline
       >
         <p className="text-gray-800 text-center">
           Scan this QR code to access the menu
@@ -48,13 +59,25 @@ const QrCodeGenerator: React.FC<QrCodeGeneratorProps> = ({ menuId = "1" }) => {
       >
         <div className="flex items-center gap-2">
           <div>
-            <svg className="w-6 h-6 text-white dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 13V4M7 14H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2m-1-5-4 5-4-5m9 8h.01"/>
+            <svg
+              className="w-6 h-6 text-white dark:text-white"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 13V4M7 14H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2m-1-5-4 5-4-5m9 8h.01"
+              />
             </svg>
           </div>
-          <div>
-              Download QR Code
-          </div>
+          <div>Download QR Code</div>
         </div>
       </button>
     </div>
