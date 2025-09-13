@@ -30,8 +30,10 @@ interface Order {
   total: number;
   date: any;
   userUID: string;
+  status: string;   // ✅ added
   docId?: string;
 }
+
 
 const Orders: FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -39,6 +41,9 @@ const Orders: FC = () => {
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // status filter state 
+  const [statusFilter, setStatusFilter] = useState<string>("All");
 
   // Pagination state
   const [pageSize, setPageSize] = useState(10);
@@ -138,6 +143,31 @@ const Orders: FC = () => {
     }
   };
 
+      const updateSelectedStatus = async (newStatus: string) => {
+      if (selected.length === 0) return;
+
+      const selectedSet = new Set(selected);
+      const prevOrders = orders;
+      const nextOrders = orders.map((o) =>
+        selectedSet.has(o.docId!) ? { ...o, status: newStatus } : o
+      );
+      setOrders(nextOrders);
+
+      try {
+        const batch = writeBatch(db);
+        selected.forEach((docId) => {
+          batch.update(doc(db, "orders", docId), { status: newStatus });
+        });
+        await batch.commit();
+        setSelected([]);
+        setDropdownOpen(false);
+      } catch (e) {
+        console.error("Failed to update status:", e);
+        setOrders(prevOrders); // rollback on error
+      }
+    };
+
+
   return (
     <div className="admin" style={{ fontFamily: "sans-serif" }}>
       <Sidebar />
@@ -151,7 +181,7 @@ const Orders: FC = () => {
 
           <div className="bg-white overflow-x-auto rounded-2xl shadow-lg border border-gray-100 p-4 space-y-8 mx-auto relative mt-10">
             {/* Action Dropdown */}
-            <div className="flex items-center justify-between flex-wrap pb-4">
+            <div className="flex items-center justify-between flex-wrap ">
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen((prev) => !prev)}
@@ -182,10 +212,63 @@ const Orders: FC = () => {
                           Delete Orders
                         </button>
                       </li>
+                      <li>
+                          <button
+                            onClick={() => updateSelectedStatus("Pending")}
+                            disabled={selected.length === 0}
+                            className="w-full text-sm text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600"
+                          >
+                            Mark as Pending
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            onClick={() => updateSelectedStatus("In Progress")}
+                            disabled={selected.length === 0}
+                            className="w-full text-sm text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600"
+                          >
+                            Mark as In Progress
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            onClick={() => updateSelectedStatus("Completed")}
+                            disabled={selected.length === 0}
+                            className="w-full text-sm text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600"
+                          >
+                            Mark as Completed
+                          </button>
+                        </li>
+
                     </ul>
                   </div>
                 )}
               </div>
+              {/* Status Filters */}
+                <div className="flex gap-2 mb-4">
+                  {["All", "Pending", "In Progress", "Completed"].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => setStatusFilter(status)}
+                      className={`text-xs font-medium px-2.5 py-0.5 rounded-sm border
+                        ${
+                          statusFilter === status
+                            ? status === "Pending"
+                              ? "bg-red-100 text-red-700 border-red-300"
+                              : status === "In Progress"
+                              ? "bg-yellow-100 text-yellow-500 border-yellow-300"
+                              : status === "Completed"
+                              ? "bg-green-100 text-green-700 border-green-300"
+                              : "bg-gray-200 text-gray-800 border-gray-500"
+                            : "bg-gray-50 text-gray-500 border-gray-300 hover:bg-gray-200"
+                        }
+                      `}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+
             </div>
 
             {/* Table */}
@@ -201,6 +284,7 @@ const Orders: FC = () => {
                     />
                   </th>
                   <th className="px-6 py-3">Order</th>
+                  <th className="px-6 py-3">Status</th>
                   <th className="px-6 py-3">Total ($)</th>
                   <th className="px-6 py-3">Date</th>
                   <th className="px-6 py-3">Overview</th>
@@ -233,7 +317,7 @@ const Orders: FC = () => {
                         <th scope="row" className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
                           {firstProduct && (
                             <img
-                              className="w-10 h-10 rounded-full object-cover"
+                              className="w-10 h-10 rounded-md object-cover"
                               src={firstProduct.urlPhoto}
                               alt={firstProduct.name}
                             />
@@ -246,6 +330,17 @@ const Orders: FC = () => {
                             {moreCount > 0 && <div className="text-sm text-gray-500">+{moreCount} more</div>}
                           </div>
                         </th>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-md
+                                ${order.status === "Pending" ? "bg-red-100 text-red-700" : ""}
+                                ${order.status === "In Progress" ? "bg-yellow-100 text-yellow-700" : ""}
+                                ${order.status === "Completed" ? "bg-green-100 text-green-700" : ""}
+                              `}
+                            >
+                              {order.status || "Pending"}
+                            </span>
+                          </td>
                         <td className="px-6 py-4">${order.total}</td>
                         <td className="px-6 py-4">
                           {order.date?.toDate ? order.date.toDate().toLocaleDateString() : "—"}
@@ -281,7 +376,7 @@ const Orders: FC = () => {
                   setCurrentPage(1);
                   setLastDocs([]);
                 }}
-                className="border rounded-md p-1 text-sm"
+                className="border rounded-md p-1 text-sm text-gray-950"
               >
                 <option value={10}>10 rows</option>
                 <option value={50}>50 rows</option>
@@ -302,7 +397,7 @@ const Orders: FC = () => {
                     <button
                       onClick={() => setCurrentPage(i + 1)}
                       className={`px-3 h-8 border ${
-                        currentPage === i + 1 ? "bg-blue-50 text-blue-600" : "bg-white text-gray-500"
+                        currentPage === i + 1 ? "bg-white text-gray-900 " : "bg-white text-gray-500"
                       }`}
                     >
                       {i + 1}
