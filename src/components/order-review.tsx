@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../config/firebase";
 import { Order } from "@/interfaces/order";
-
+import { Price, useCurrency } from "@/context/currencyContext";
 
 type OrderReviewProps = {
   next: () => void;
@@ -23,7 +23,7 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
   const { selectedProducts, setSelectedProducts } = useAuth();
   const [total, setTotal] = useState(0);
   const { toast } = useToast();
-
+  const { currency } = useCurrency();
   const [formData, setFormData] = useState<Order>({
     number: null,
     date: new Date(),
@@ -33,56 +33,56 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
     snackId: snackId,
   });
 
-    async function addOrder() {
-      try {
-        const ordersRef = collection(db, "orders");
+  async function addOrder() {
+    try {
+      const ordersRef = collection(db, "orders");
 
-        // Étape 1 : Récupérer le dernier document par order décroissant sur le champ `number`
-        const q = query(ordersRef, orderBy("number", "desc"), limit(1));
-        const querySnapshot = await getDocs(q);
+      // Étape 1 : Récupérer le dernier document par order décroissant sur le champ `number`
+      const q = query(ordersRef, orderBy("number", "desc"), limit(1));
+      const querySnapshot = await getDocs(q);
 
-        let newNumber = 0;
-        if (!querySnapshot.empty) {
-          const lastOrder = querySnapshot.docs[0].data();
-          newNumber = lastOrder.number + 1;
-        } else {
-          newNumber = 1;
-        }
-
-        // Étape 2 : Créer le nouveau document avec `number`
-        const newOrder = {
-          ...formData,
-          products: selectedProducts,
-          total: total,
-          userUID: auth.currentUser?.uid,
-          number: newNumber,
-        };
-
-        // ✅ Ajouter la commande
-        const docRef = await addDoc(ordersRef, newOrder);
-
-        showToast(
-          "Confirmed",
-          "Your order will be prepared as soon as possible 😊",
-          "success"
-        );
-
-        // ✅ Créer la notification directement dans Firestore
-        await addDoc(collection(db, "notifications"), {
-          orderId: docRef.id, // ID du document de la commande
-          restaurantId: newOrder.snackId,
-          title: `New Order #${newOrder.number}`,
-          message: `${auth.currentUser?.displayName || "Client"} ordered, total: ${newOrder.total}`,
-          createdAt: new Date(), // serveur local timestamp
-          read: false,
-          type: "order",
-        });
-
-      } catch (error) {
-        console.error("Error adding order: ", error);
+      let newNumber = 0;
+      if (!querySnapshot.empty) {
+        const lastOrder = querySnapshot.docs[0].data();
+        newNumber = lastOrder.number + 1;
+      } else {
+        newNumber = 1;
       }
-    }
 
+      // Étape 2 : Créer le nouveau document avec `number`
+      const newOrder = {
+        ...formData,
+        products: selectedProducts,
+        total: total,
+        userUID: auth.currentUser?.uid,
+        number: newNumber,
+      };
+
+      // ✅ Ajouter la commande
+      const docRef = await addDoc(ordersRef, newOrder);
+
+      showToast(
+        "Confirmed",
+        "Your order will be prepared as soon as possible 😊",
+        "success"
+      );
+
+      // ✅ Créer la notification directement dans Firestore
+      await addDoc(collection(db, "notifications"), {
+        orderId: docRef.id, // ID du document de la commande
+        restaurantId: newOrder.snackId,
+        title: `New Order #${newOrder.number}`,
+        message: `${
+          auth.currentUser?.displayName || "Client"
+        } ordered, total: ${newOrder.total}`,
+        createdAt: new Date(), // serveur local timestamp
+        read: false,
+        type: "order",
+      });
+    } catch (error) {
+      console.error("Error adding order: ", error);
+    }
+  }
 
   function showToast(
     title: string,
@@ -167,19 +167,25 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
       <ul className="mb-4">
         {selectedProducts.map((product: any) =>
           product?.cost.map((p: any, index: number) => {
-              return p.quantity > 0 && (
+            return (
+              p.quantity > 0 && (
                 // <li key={product.id}>
                 //   ✅ {product.name}
                 // </li>
                 <div key={index} className="mt-6 border-t border-black/40">
                   <dl className="divide-y divide-gray/10">
                     <div className="px-4 py-6 sm:flex sm:items-center sm:justify-between sm:gap-4 sm:px-0">
-                      <img src={product.urlPhoto} alt="product image" width={"50px"} />
+                      <img
+                        src={product.urlPhoto}
+                        alt="product image"
+                        width={"50px"}
+                      />
                       <dt className="text-sm font-medium text-black">
                         {product?.name}
                       </dt>
                       <dd className="mt-1 text-sm text-gray-700 sm:mt-0">
-                        {p.quantity} unity * {p.price} MAD
+                        {p.quantity} unity *{" "}
+                        <Price amount={p.price} from={currency} />
                       </dd>
                       <div className="flex sm:flex-col md:flex-row justify-end items-center sm:mt-3 md:mt-0 sm:gap-5 md:gap-0">
                         <div className="flex items-center justify-center gap-4">
@@ -199,15 +205,20 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
                             +
                           </button>
                         </div>
-                        <span className="ml-2">{p.quantity * p.price} MAD</span>
+                        <span className="ml-2">
+                          <Price
+                            amount={p.quantity * p.price}
+                            from={currency}
+                          />
+                        </span>
                       </div>
                     </div>
                   </dl>
                 </div>
               )
-          }
-          ))
-        }
+            );
+          })
+        )}
       </ul>
       <div className="flex flex-col-reverse space-e-2 justify-between items-center mt-5 md:mt-0  md:flex-row md:justify-between md:items-end">
         <div className="flex gap-5 items-center justify-center">
@@ -219,7 +230,7 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
           </button>
           <button
             onClick={() => {
-              addOrder()
+              addOrder();
               next();
             }}
             className="bg-red-500 text-white px-4 py-2 rounded block m-auto mt-10 cursor-pointer"
@@ -227,7 +238,9 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
             Confirmer
           </button>
         </div>
-        <p className="text-red-700 text-2xl">Total : {total} MAD</p>
+        <p className="text-red-700 text-2xl">
+          Total : <Price amount={total} from={currency} />
+        </p>
       </div>
     </div>
   );

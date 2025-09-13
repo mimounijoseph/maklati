@@ -4,11 +4,31 @@ import { useToast } from "@/components/ui/toast";
 import { useAuth } from "../../../context/useContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../config/firebase";
+import { Currency, useCurrency } from "@/context/currencyContext";
+import Select from "react-select";
+
+const options = [
+  {
+    value: "USD",
+    label: "USD - $",
+    flag: "https://flagcdn.com/us.svg",
+  },
+  {
+    value: "EUR",
+    label: "EUR - €",
+    flag: "https://flagcdn.com/eu.svg",
+  },
+  {
+    value: "MAD",
+    label: "MAD - د.م",
+    flag: "https://flagcdn.com/ma.svg",
+  },
+];
 
 function Header() {
   const { toast } = useToast();
   const { user, loading } = useAuth();
-
+  const { currency, setCurrency } = useCurrency();
   function showToast(
     title: string,
     message: string,
@@ -274,6 +294,28 @@ function Header() {
                   </li>
                 </>
               )}
+<li>
+<Select
+      value={options.find((o) => o.value === currency)}
+      onChange={(opt:any) => setCurrency(opt?.value)}
+      options={options}
+      formatOptionLabel={(option) => (
+        <div className="flex items-center gap-2 text-black" style={{fontFamily: 'sans-serif'}}>
+          <img src={option.flag} alt={option.value} className="w-5 h-4 rounded-sm" />
+          <span>{option.label}</span>
+        </div>
+      )}
+      className="w-44"
+      styles={{
+        control: (base) => ({
+          ...base,
+          borderRadius: "0.5rem",
+          padding: "2px",
+          color:'black'
+        }),
+      }}
+    />
+</li>
             </ul>
           </div>
         </div>
