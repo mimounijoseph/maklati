@@ -68,8 +68,8 @@ const RevenueChart = () => {
             opacityTo: 0,
             stops: [0, 90, 100],
             colorStops: [
-              { offset: 0, color: "#1A56DB", opacity: 0.5 },
-              { offset: 100, color: "#1A56DB", opacity: 0 },
+              { offset: 0, color: "#8B5CF6", opacity: 0.5 },
+              { offset: 100, color: "#8B5CF6", opacity: 0 },
             ],
           },
         },

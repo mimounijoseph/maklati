@@ -200,3 +200,9 @@ ul{
 .admin ul{
   font-family: 'Inter', sans-serif !important;
 }
+button{
+  cursor: pointer;
+}
+a{
+  cursor: pointer;
+}

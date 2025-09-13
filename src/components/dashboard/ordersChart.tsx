@@ -18,7 +18,6 @@ const OrdersChart = () => {
 
       let total = 0;
       const ordersByDate: Record<string, number> = {};
-      const allDaysSet = new Set<string>();
 
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -34,30 +33,21 @@ const OrdersChart = () => {
 
         const dayStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
         ordersByDate[dayStr] = (ordersByDate[dayStr] || 0) + 1;
-
-        // Get day of week
-        const weekday = date.toLocaleDateString("en-US", { weekday: "short" }); // e.g., Mon, Tue
-        allDaysSet.add(weekday);
       });
 
       setTotalOrders(total);
 
-      // Build series based on all weekdays found
-      const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-      const seriesData: { x: string; y: number }[] = [];
-
-      weekdays.forEach((day) => {
-        let totalForDay = 0;
-        // Sum all orders matching this weekday
-        Object.keys(ordersByDate).forEach((dateStr) => {
-          const date = new Date(dateStr);
-          const weekdayStr = date.toLocaleDateString("en-US", { weekday: "short" });
-          if (weekdayStr === day) {
-            totalForDay += ordersByDate[dateStr];
-          }
+      // Convert to chart data sorted by date with formatted labels
+      const seriesData = Object.keys(ordersByDate)
+        .sort()
+        .map((dayStr) => {
+          const date = new Date(dayStr);
+          const formatted = date.toLocaleDateString("en-US", {
+            day: "2-digit",
+            month: "short", // e.g. "09 Aug"
+          });
+          return { x: formatted, y: ordersByDate[dayStr] };
         });
-        seriesData.push({ x: day, y: totalForDay });
-      });
 
       const ApexCharts = (await import("apexcharts")).default;
 
@@ -103,16 +93,17 @@ const OrdersChart = () => {
           labels: { style: { fontSize: "12px", colors: "#9CA3AF" } },
         },
         grid: { show: true, borderColor: "#E5E7EB", strokeDashArray: 3 },
-        tooltip: { enabled: true },
+        tooltip: { enabled: false },
         markers: { size: 0 },
         legend: { show: false },
       };
 
-      const chart = new ApexCharts(
-        document.getElementById("orders-chart"),
-        options
-      );
-      chart.render();
+      const chartEl = document.getElementById("orders-chart");
+      if (chartEl) {
+        chartEl.innerHTML = ""; // clear before render
+        const chart = new ApexCharts(chartEl, options);
+        chart.render();
+      }
     };
 
     fetchDataAndRenderChart();
