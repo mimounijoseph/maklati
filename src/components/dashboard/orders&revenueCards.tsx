@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebase";
 
 const RevenueOrdersCards = () => {
@@ -11,27 +11,36 @@ const RevenueOrdersCards = () => {
   const [totalRevenue, setTotalRevenue] = useState(0);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const querySnapshot = await getDocs(collection(db, "orders"));
+    const unsubscribe = onSnapshot(collection(db, "orders"), (querySnapshot) => {
       let totalOrdersCount = 0;
       let totalRevenueSum = 0;
       let todayOrdersCount = 0;
       let todayRevenueSum = 0;
 
       const today = new Date();
-      const todayDate = today.toISOString().split("T")[0]; // YYYY-MM-DD
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        const orderDate = data.createdAt?.toDate(); // Firestore Timestamp → Date
-        const orderDateString = orderDate?.toISOString().split("T")[0];
 
         totalOrdersCount++;
-        totalRevenueSum += data.total || 0;
+        totalRevenueSum += Number(data.total) || 0;
 
-        if (orderDateString === todayDate) {
-          todayOrdersCount++;
-          todayRevenueSum += data.total || 0;
+        // Pick createdAt or fallback to date
+        const timestamp = data.createdAt || data.date;
+        if (timestamp) {
+          const orderDate =
+            typeof timestamp.toDate === "function"
+              ? timestamp.toDate()
+              : new Date(timestamp);
+
+          if (
+            orderDate.getDate() === today.getDate() &&
+            orderDate.getMonth() === today.getMonth() &&
+            orderDate.getFullYear() === today.getFullYear()
+          ) {
+            todayOrdersCount++;
+            todayRevenueSum += Number(data.total) || 0;
+          }
         }
       });
 
@@ -39,9 +48,10 @@ const RevenueOrdersCards = () => {
       setTotalRevenue(totalRevenueSum);
       setTodayOrders(todayOrdersCount);
       setTodayRevenue(todayRevenueSum);
-    };
+    });
 
-    fetchData();
+    // Cleanup listener on unmount
+    return () => unsubscribe();
   }, []);
 
   const cards = [
@@ -52,7 +62,7 @@ const RevenueOrdersCards = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
       {cards.map((card, idx) => (
         <div
           key={idx}

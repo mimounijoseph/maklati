@@ -42,12 +42,16 @@ export class ProductService {
   }
 
   async getBySnackId(snackId: any) {
+    if (!snackId) {
+      console.error("snackId is undefined");
+      return [];
+    }
     try {
       const productsRef = collection(db, "plat");
       const q = query(productsRef, where("snackId", "==", snackId));
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
-          const products = querySnapshot.docs.map((doc) => ({
+        const products = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));

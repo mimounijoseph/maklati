@@ -86,8 +86,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
       >
         <Bell className="w-7 h-7" />
         {unreadCount > 0 && (
-          <div className="absolute block w-4 h-4 bg-red-600 border-2 border-white rounded-full -top-0.5 left-3 flex items-center justify-center">
-            <p className="text-white text-xs">{unreadCount}</p>
+          <div className="absolute -top-0.5 left-3 bg-red-600 border-2 border-white rounded-full flex items-center justify-center min-w-[20px] h-[20px] px-1">
+            <p className="text-white text-xs  leading-none">{unreadCount}</p>
           </div>
         )}
       </button>
@@ -106,13 +106,13 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
 
             {notifications.map((notif, index) => (
               <div key={index} className="flex px-4 py-3 hover:bg-gray-100">
-                <div className="shrink-0 relative">
+                {/* <div className="shrink-0 relative">
                   <img
                     className="rounded-full w-11 h-11"
                     src="https://randomuser.me/api/portraits/lego/1.jpg"
                     alt="profile"
                   />
-                </div>
+                </div> */}
                 <div className="w-full ps-3">
                   <div className="text-gray-500 text-sm mb-1.5">{notif.message}</div>
                   <div className="text-xs text-blue-600">

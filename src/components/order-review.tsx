@@ -13,7 +13,11 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../config/firebase";
 import { Order } from "@/interfaces/order";
+<<<<<<< HEAD
 import { useTranslation } from "react-i18next";
+=======
+import { Price, useCurrency } from "@/context/currencyContext";
+>>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
 
 type OrderReviewProps = {
   next: () => void;
@@ -26,7 +30,7 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
   const { selectedProducts, setSelectedProducts } = useAuth();
   const [total, setTotal] = useState(0);
   const { toast } = useToast();
-
+  const { currency } = useCurrency();
   const [formData, setFormData] = useState<Order>({
     number: null,
     date: new Date(),
@@ -36,7 +40,62 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
     snackId: snackId,
   });
 
+<<<<<<< HEAD
   const showToast = (
+=======
+  async function addOrder() {
+    try {
+      const ordersRef = collection(db, "orders");
+
+      // Étape 1 : Récupérer le dernier document par order décroissant sur le champ `number`
+      const q = query(ordersRef, orderBy("number", "desc"), limit(1));
+      const querySnapshot = await getDocs(q);
+
+      let newNumber = 0;
+      if (!querySnapshot.empty) {
+        const lastOrder = querySnapshot.docs[0].data();
+        newNumber = lastOrder.number + 1;
+      } else {
+        newNumber = 1;
+      }
+
+      // Étape 2 : Créer le nouveau document avec `number`
+      const newOrder = {
+        ...formData,
+        products: selectedProducts,
+        total: total,
+        userUID: auth.currentUser?.uid,
+        number: newNumber,
+      };
+
+      // ✅ Ajouter la commande
+      const docRef = await addDoc(ordersRef, newOrder);
+
+      showToast(
+        "Confirmed",
+        "Your order will be prepared as soon as possible 😊",
+        "success"
+      );
+
+      // ✅ Créer la notification directement dans Firestore
+      await addDoc(collection(db, "notifications"), {
+        orderId: docRef.id, // ID du document de la commande
+        restaurantId: newOrder.snackId,
+        title: `New Order #${newOrder.number}`,
+        message: `${
+          auth.currentUser?.displayName || "Client"
+        } ordered, total: ${newOrder.total}`,
+        createdAt: new Date(), // serveur local timestamp
+        read: false,
+        type: "order",
+      });
+    } catch (error) {
+      console.error("Error adding order: ", error);
+    }
+  }
+
+  function showToast(
+>>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
     title: string,
     message: string,
     variant:
@@ -125,6 +184,7 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
       <ul className="mb-4">
         {selectedProducts.map((product: any) =>
           product?.cost.map((p: any, index: number) => {
+<<<<<<< HEAD
             if (p.quantity <= 0) return null;
 
             const lineTotal = p.quantity * p.price;
@@ -167,15 +227,67 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
                         >
                           +
                         </button>
+=======
+            return (
+              p.quantity > 0 && (
+                // <li key={product.id}>
+                //   ✅ {product.name}
+                // </li>
+                <div key={index} className="mt-6 border-t border-black/40">
+                  <dl className="divide-y divide-gray/10">
+                    <div className="px-4 py-6 sm:flex sm:items-center sm:justify-between sm:gap-4 sm:px-0">
+                      <img
+                        src={product.urlPhoto}
+                        alt="product image"
+                        width={"50px"}
+                      />
+                      <dt className="text-sm font-medium text-black">
+                        {product?.name}
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-700 sm:mt-0">
+                        {p.quantity} unity *{" "}
+                        <Price amount={p.price} from={currency} />
+                      </dd>
+                      <div className="flex sm:flex-col md:flex-row justify-end items-center sm:mt-3 md:mt-0 sm:gap-5 md:gap-0">
+                        <div className="flex items-center justify-center gap-4">
+                          <button
+                            onClick={() => decrement(product, index)}
+                            className="w-8 h-8 text-lg font-bold text-white bg-red-500 rounded-full hover:bg-red-600 transition cursor-pointer"
+                          >
+                            −
+                          </button>
+                          <span className="text-lg font-medium text-black">
+                            {p.quantity}
+                          </span>
+                          <button
+                            onClick={() => increment(product, index)}
+                            className="w-8 h-8 text-lg font-bold text-white bg-green-500 rounded-full hover:bg-green-600 transition cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="ml-2">
+                          <Price
+                            amount={p.quantity * p.price}
+                            from={currency}
+                          />
+                        </span>
+>>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
                       </div>
 
                       <span className="ml-2">
                         {t("orderReview.line_total")}: {fmt(lineTotal)}
                       </span>
                     </div>
+<<<<<<< HEAD
                   </div>
                 </dl>
               </div>
+=======
+                  </dl>
+                </div>
+              )
+>>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
             );
           })
         )}
@@ -191,8 +303,13 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
           </button>
 
           <button
+<<<<<<< HEAD
             onClick={async () => {
               await addOrder();
+=======
+            onClick={() => {
+              addOrder();
+>>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
               next();
             }}
             className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer"
@@ -200,9 +317,14 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
             {t("orderReview.confirm")}
           </button>
         </div>
+<<<<<<< HEAD
 
         <p className="text-red-700 text-2xl">
           {t("orderReview.total")} : {fmt(total)}
+=======
+        <p className="text-red-700 text-2xl">
+          Total : <Price amount={total} from={currency} />
+>>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
         </p>
       </div>
     </div>
