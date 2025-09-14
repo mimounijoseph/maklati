@@ -1,6 +1,7 @@
+"use client";
+
 import { useAuth } from "@/context/useContext";
-import { Product } from "./product-selection";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useToast } from "./ui/toast";
 import {
   collection,
@@ -12,14 +13,16 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../config/firebase";
 import { Order } from "@/interfaces/order";
-
+import { useTranslation } from "react-i18next";
 
 type OrderReviewProps = {
   next: () => void;
   prev: () => void;
   snackId: any;
 };
+
 export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
+  const { t, i18n } = useTranslation("common");
   const { selectedProducts, setSelectedProducts } = useAuth();
   const [total, setTotal] = useState(0);
   const { toast } = useToast();
@@ -33,58 +36,7 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
     snackId: snackId,
   });
 
-    async function addOrder() {
-      try {
-        const ordersRef = collection(db, "orders");
-
-        // Étape 1 : Récupérer le dernier document par order décroissant sur le champ `number`
-        const q = query(ordersRef, orderBy("number", "desc"), limit(1));
-        const querySnapshot = await getDocs(q);
-
-        let newNumber = 0;
-        if (!querySnapshot.empty) {
-          const lastOrder = querySnapshot.docs[0].data();
-          newNumber = lastOrder.number + 1;
-        } else {
-          newNumber = 1;
-        }
-
-        // Étape 2 : Créer le nouveau document avec `number`
-        const newOrder = {
-          ...formData,
-          products: selectedProducts,
-          total: total,
-          userUID: auth.currentUser?.uid,
-          number: newNumber,
-        };
-
-        // ✅ Ajouter la commande
-        const docRef = await addDoc(ordersRef, newOrder);
-
-        showToast(
-          "Confirmed",
-          "Your order will be prepared as soon as possible 😊",
-          "success"
-        );
-
-        // ✅ Créer la notification directement dans Firestore
-        await addDoc(collection(db, "notifications"), {
-          orderId: docRef.id, // ID du document de la commande
-          restaurantId: newOrder.snackId,
-          title: `New Order #${newOrder.number}`,
-          message: `${auth.currentUser?.displayName || "Client"} ordered, total: ${newOrder.total}`,
-          createdAt: new Date(), // serveur local timestamp
-          read: false,
-          type: "order",
-        });
-
-      } catch (error) {
-        console.error("Error adding order: ", error);
-      }
-    }
-
-
-  function showToast(
+  const showToast = (
     title: string,
     message: string,
     variant:
@@ -94,141 +46,193 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
       | "warning"
       | "info"
       | undefined
-  ) {
+  ) => {
     toast({
-      title: title,
+      title,
       description: message,
-      variant: variant,
+      variant,
       duration: 2500,
     });
-  }
+  };
 
-  function calculTotal() {
-    let total = selectedProducts.reduce(
-      (sum1: any, prod: any) =>
-        sum1 +
+  const calculTotal = () => {
+    const sum = selectedProducts.reduce(
+      (acc: number, prod: any) =>
+        acc +
         prod?.cost.reduce(
-          (sum: any, item: any) => sum + item.quantity * item.price,
+          (sub: number, item: any) => sub + item.quantity * item.price,
           0
         ),
       0
     );
-    setTotal(total);
-  }
+    setTotal(sum);
+  };
+
   useEffect(() => {
     calculTotal();
   }, [selectedProducts]);
 
-  function decrement(product: any, index: number): void {
-    if (product.cost[index].quantity > 0) {
-      let myProduct = selectedProducts.find((p: any) => p.id == product.id);
-      if (myProduct) {
-        const updatedProducts = selectedProducts.map((p: any) => {
-          if (p.id == product?.id) {
-            const updatedCost = p.cost.map((e: any, index1: number) => {
-              if (index == index1) {
-                e.quantity--; // Update the quantity
-              }
-              return e;
-            });
-            return { ...p, cost: updatedCost };
-          }
-          return p;
-        });
-        setSelectedProducts(updatedProducts);
+  async function addOrder() {
+    try {
+      const ordersRef = collection(db, "orders");
+      const q = query(ordersRef, orderBy("number", "desc"), limit(1));
+      const querySnapshot = await getDocs(q);
+
+      let newNumber = 1;
+      if (!querySnapshot.empty) {
+        const lastOrder = querySnapshot.docs[0].data();
+        newNumber = (lastOrder.number || 0) + 1;
       }
+
+      const newOrder = {
+        ...formData,
+        products: selectedProducts,
+        total: total,
+        userUID: auth.currentUser?.uid,
+        number: newNumber,
+      };
+
+      const docRef = await addDoc(ordersRef, newOrder);
+
+      showToast(
+        "Confirmed",
+        "Your order will be prepared as soon as possible 😊",
+        "success"
+      );
+
+      await addDoc(collection(db, "notifications"), {
+        orderId: docRef.id,
+        restaurantId: newOrder.snackId,
+        title: `New Order #${newOrder.number}`,
+        message: `${auth.currentUser?.displayName || "Client"} ordered, total: ${newOrder.total}`,
+        createdAt: new Date(),
+        read: false,
+        type: "order",
+      });
+    } catch (error) {
+      console.error("Error adding order: ", error);
     }
   }
 
-  function increment(product: any, index: number): void {
-    let myProduct = selectedProducts.find((p: any) => p.id == product.id);
-    if (myProduct) {
-      const updatedProducts = selectedProducts.map((p: any) => {
-        if (p.id == product?.id) {
-          const updatedCost = p.cost.map((e: any, index1: number) => {
-            if (index == index1) {
-              e.quantity++;
-            }
-            return e;
-          });
-          return { ...p, cost: updatedCost };
-        }
-        return p;
-      });
-      setSelectedProducts(updatedProducts);
-    }
-  }
+  const fmt = (value: number) => t("currency_mad", { value });
 
   return (
     <div className="bg-white/70 text-black md:w-[60%] m-auto md:rounded-2xl px-10 py-5">
       <h1 className="text-2xl font-semibold mb-2 text-center">
-        Your order details
+        {t("orderReview.title")}
       </h1>
+
       <ul className="mb-4">
         {selectedProducts.map((product: any) =>
           product?.cost.map((p: any, index: number) => {
-              return p.quantity > 0 && (
-                // <li key={product.id}>
-                //   ✅ {product.name}
-                // </li>
-                <div key={index} className="mt-6 border-t border-black/40">
-                  <dl className="divide-y divide-gray/10">
-                    <div className="px-4 py-6 sm:flex sm:items-center sm:justify-between sm:gap-4 sm:px-0">
-                      <img src={product.urlPhoto} alt="product image" width={"50px"} />
-                      <dt className="text-sm font-medium text-black">
-                        {product?.name}
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-700 sm:mt-0">
-                        {p.quantity} unity * {p.price} MAD
-                      </dd>
-                      <div className="flex sm:flex-col md:flex-row justify-end items-center sm:mt-3 md:mt-0 sm:gap-5 md:gap-0">
-                        <div className="flex items-center justify-center gap-4">
-                          <button
-                            onClick={() => decrement(product, index)}
-                            className="w-8 h-8 text-lg font-bold text-white bg-red-500 rounded-full hover:bg-red-600 transition cursor-pointer"
-                          >
-                            −
-                          </button>
-                          <span className="text-lg font-medium text-black">
-                            {p.quantity}
-                          </span>
-                          <button
-                            onClick={() => increment(product, index)}
-                            className="w-8 h-8 text-lg font-bold text-white bg-green-500 rounded-full hover:bg-green-600 transition cursor-pointer"
-                          >
-                            +
-                          </button>
-                        </div>
-                        <span className="ml-2">{p.quantity * p.price} MAD</span>
+            if (p.quantity <= 0) return null;
+
+            const lineTotal = p.quantity * p.price;
+
+            return (
+              <div key={`${product.id}-${index}`} className="mt-6 border-t border-black/40">
+                <dl className="divide-y divide-gray/10">
+                  <div className="px-4 py-6 sm:flex sm:items-center sm:justify-between sm:gap-4 sm:px-0">
+                    <img
+                      src={product.urlPhoto}
+                      alt="product image"
+                      width="50"
+                      height="50"
+                    />
+
+                    <dt className="text-sm font-medium text-black">
+                      {product?.name}
+                    </dt>
+
+                    <dd className="mt-1 text-sm text-gray-700 sm:mt-0">
+                      {t("orderReview.qty", { count: p.quantity })} • {fmt(p.price)}
+                    </dd>
+
+                    <div className="flex sm:flex-col md:flex-row justify-end items-center sm:mt-3 md:mt-0 sm:gap-5 md:gap-0">
+                      <div className="flex items-center justify-center gap-4">
+                        <button
+                          onClick={() => decrement(product, index)}
+                          className="w-8 h-8 text-lg font-bold text-white bg-red-500 rounded-full hover:bg-red-600 transition cursor-pointer"
+                          aria-label="decrement"
+                        >
+                          −
+                        </button>
+                        <span className="text-lg font-medium text-black">
+                          {p.quantity}
+                        </span>
+                        <button
+                          onClick={() => increment(product, index)}
+                          className="w-8 h-8 text-lg font-bold text-white bg-green-500 rounded-full hover:bg-green-600 transition cursor-pointer"
+                          aria-label="increment"
+                        >
+                          +
+                        </button>
                       </div>
+
+                      <span className="ml-2">
+                        {t("orderReview.line_total")}: {fmt(lineTotal)}
+                      </span>
                     </div>
-                  </dl>
-                </div>
-              )
-          }
-          ))
-        }
+                  </div>
+                </dl>
+              </div>
+            );
+          })
+        )}
       </ul>
-      <div className="flex flex-col-reverse space-e-2 justify-between items-center mt-5 md:mt-0  md:flex-row md:justify-between md:items-end">
+
+      <div className="flex flex-col-reverse justify-between items-center mt-5 md:mt-0 md:flex-row md:justify-between md:items-end gap-4">
         <div className="flex gap-5 items-center justify-center">
           <button
             onClick={prev}
-            className="bg-black text-white px-4 py-2 rounded block m-auto mt-10 cursor-pointer"
+            className="bg-black text-white px-4 py-2 rounded cursor-pointer"
           >
-            Retour
+            {t("orderReview.back")}
           </button>
+
           <button
-            onClick={() => {
-              addOrder()
+            onClick={async () => {
+              await addOrder();
               next();
             }}
-            className="bg-red-500 text-white px-4 py-2 rounded block m-auto mt-10 cursor-pointer"
+            className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer"
           >
-            Confirmer
+            {t("orderReview.confirm")}
           </button>
         </div>
-        <p className="text-red-700 text-2xl">Total : {total} MAD</p>
+
+        <p className="text-red-700 text-2xl">
+          {t("orderReview.total")} : {fmt(total)}
+        </p>
       </div>
     </div>
   );
+
+  function decrement(product: any, idx: number) {
+    if (product.cost[idx].quantity > 0) {
+      const updated = selectedProducts.map((p: any) => {
+        if (p.id === product.id) {
+          const cost = p.cost.map((e: any, i: number) =>
+            i === idx ? { ...e, quantity: e.quantity - 1 } : e
+          );
+          return { ...p, cost };
+        }
+        return p;
+      });
+      setSelectedProducts(updated);
+    }
+  }
+
+  function increment(product: any, idx: number) {
+    const updated = selectedProducts.map((p: any) => {
+      if (p.id === product.id) {
+        const cost = p.cost.map((e: any, i: number) =>
+          i === idx ? { ...e, quantity: e.quantity + 1 } : e
+        );
+        return { ...p, cost };
+      }
+      return p;
+    });
+    setSelectedProducts(updated);
+  }
 };

@@ -1,0 +1,89 @@
+{
+  "appName": "Menu Snack",
+  "hello": "Bienvenue, {{name}} !",
+  "currency_mad": "{{value, number(mad)}}",
+  "add_to_cart": "Ajouter au panier",
+   "brand": "maklati",
+  "menu": "Menu",
+  "snacks": "Snacks",
+  "about": "À propos",
+  "contact": "Contact",
+  "login": "Se connecter",
+  "signup": "Créer un compte",
+  "logout": "Se déconnecter",
+  "logout_success_title": "Succès !",
+  "logout_success_msg": "Vous êtes déconnecté",
+  "hero": {
+    "title_line1": "Partagez vos menus facilement,",
+    "title_line2": "raviſſez vos clients instantanément",
+    "words": ["Facile", "Rapide", "Délicieux", "Fluide", "Interactif", "Moderne", "Pratique"],
+    "cta": "Commencer maintenant",
+    "image_alt": "Burger avec frites sur un plateau"
+  },
+  "footer": {
+    "brand": "maklati",
+    "description": "Votre snack préféré en ligne 🍔🍟. Commandez facilement et profitez où que vous soyez.",
+    "quick_links": "Liens rapides",
+    "links": {
+      "home": "Accueil",
+      "snacks": "Snacks",
+      "about": "À propos",
+      "contact": "Contact"
+    },
+    "follow_us": "Suivez-nous",
+    "socials": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "tiktok": "TikTok"
+    },
+    "copyright": "Tous droits réservés.",
+    "legal": {
+      "terms": "Conditions d'utilisation",
+      "privacy": "Politique de confidentialité",
+      "mentions": "Mentions légales"
+    }
+  },
+  "products": {
+    "title": "Menu",
+    "subtitle": "Choisissez votre catégorie préférée",
+    "loading": "Préparation en cours…",
+    "order_now": "Commander",
+    "empty": "Aucun article dans cette catégorie pour le moment.",
+    "categories": {
+      "pizza": "Pizza",
+      "tacos": "Tacos",
+      "burger": "Burger",
+      "drinks": "Boissons",
+      "dessert": "Dessert"
+    }
+  },
+  "menuPage": {
+    "title": "Snacks",
+    "search_placeholder": "Rechercher par nom",
+    "loading": "Préparation en cours…",
+    "empty": "Aucun snack trouvé."
+  },
+  "checkout": {
+    "validate_products": "Valider les produits",
+    "select_one_hint": "Sélectionnez au moins un article",
+      "steps": ["Ajoutez votre commande", "Validez votre commande", "Attendez votre commande"]
+  },
+  "orderReview": {
+    "title": "Détails de votre commande",
+    "qty_one": "{{count}} unité",
+    "qty_other": "{{count}} unités",
+    "line_total": "Total ligne",
+    "total": "Total",
+    "back": "Retour",
+    "confirm": "Confirmer"
+  },
+  "orderConfirmation": {
+    "creating_title": "Création de la commande !",
+    "creating_message": "Veuillez patienter",
+    "creating_loading": "⌛ En cours...",
+    "done_title": "Le numéro de commande est {{num}}",
+    "done_message": "Merci pour votre commande",
+    "done_loading": "⌛ Votre commande sera préparée au plus vite",
+    "img_alt": "Animation de cuisine fast-food"
+  }
+}

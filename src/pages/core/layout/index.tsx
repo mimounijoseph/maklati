@@ -7,8 +7,6 @@ import { ToastProvider } from "@/components/ui/toast";
 
 type LayoutProps = {
   children: ReactNode;
-
-  
 };
 
 
