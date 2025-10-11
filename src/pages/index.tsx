@@ -1,9 +1,15 @@
+"use client";
+
 import Image from "next/image";
-import { Geist, Geist_Mono, Sansita_Swashed } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Card from "@/components/card";
 import { MorphoTextFlip } from "@/components/ui/morphotextflip";
 import { InteractiveInput } from "@/components/ui/interactive-input";
 import Layout from "./core/layout";
+
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import "@/i18n.client"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,6 +22,17 @@ const geistMono = Geist_Mono({
 });
 
 export default function Home() {
+  const { t, i18n } = useTranslation("common");
+
+  const words = useMemo(() => {
+    const arr = t("hero.words", { returnObjects: true }) as string[]; 
+    return Array.isArray(arr) ? arr : [];
+  }, [t, i18n.language]);
+
+  const handleStart = () => {
+    window.location.href = "/snack";
+  };
+
   return (
     <Layout>
       <section className="p-3 flex flex-col md:flex-row justify-center gap-2 align-middle">
@@ -24,25 +41,19 @@ export default function Home() {
             className="text-5xl mb-2 pt-[100px]"
             style={{ fontFamily: "Sansita Swashed" }}
           >
-            Easily Share Menus,
+            {t("hero.title_line1")}
             <br />
-            Instantly Delight Customers
+            {t("hero.title_line2")}
           </h1>
+
           <MorphoTextFlip
-            words={[
-              "Easy",
-              "Fast",
-              "Delicious",
-              "Seamless",
-              "Interactive",
-              "Modern",
-              "Convenient",
-            ]}
-            textClassName="text-4xl md:text-7xl  font-bold mt-1"
+            words={words}
+            textClassName="text-4xl md:text-7xl font-bold mt-1"
             animationType="flipY"
           />
+
           <InteractiveInput
-            className=" text-white w-fit cursor-pointer mt-2"
+            className="text-white w-fit cursor-pointer mt-2"
             variant="default"
             inputSize="default"
             glow={false}
@@ -55,11 +66,18 @@ export default function Home() {
             shimmerDuration="3s"
             borderRadius="100px"
             background="transparent"
-            placeholder="Start now"
-            onClick={() => (window.location.href = "/snack")}
+            placeholder={t("hero.cta")}
+            onClick={handleStart}
           />
         </div>
-        <img src="hero_img.png" alt="burger" width="500px" />
+
+        <Image
+          src="/hero_img.png"
+          alt={t("hero.image_alt")}
+          width={500}
+          height={400}
+          priority
+        />
       </section>
     </Layout>
   );

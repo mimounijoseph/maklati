@@ -138,18 +138,18 @@ function Card({ product, isOrderForm }: CardTypes) {
             </span>
           </div>
 
-          <div className="mt-5 text-center px-2">
-            <h3 className="text-lg font-semibold text-slate-900">
+          <div className="mt-5 text-center px-2 h-16 overflow-auto no-scrollbar">
+            <h3 className="text-sm text-start font-semibold text-slate-900">
               {product?.name}
             </h3>
-            <p className="mt-1 text-sm leading-6 text-slate-600">
-              {product?.description}
-            </p>
+              <p className="text-xs text-start leading-6 text-slate-600 ">
+                {"this is a delicious " + product?.name + " to try! It's built using bio-organic ingredients and it is very tasty"}
+              </p>
           </div>
 
           {isOrderForm && (
             <>
-              <div className="mt-4">
+              <div className=" bg-white ">
                 <div className="mt-4 flex items-center justify-center gap-2">
                   {sizes.map((s: any) => {
                     const active = selectedSize === s;

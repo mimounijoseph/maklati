@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import Card from "./card";
 import { useAuth } from "@/context/useContext";
 // import { Category } from "@/enums/category";
 import { ProductService } from "@/services/product";
+
 import { CategoryService } from "@/services/CategoryService";
 
 export type Product = {
@@ -18,6 +21,9 @@ export type Product = {
   }[];
 };
 
+import { useTranslation } from "react-i18next";
+
+
 type Category  = {
   id:string,
   name:string,
@@ -30,9 +36,11 @@ type ProductSelectionProps = {
   next: () => void;
   snackId: any;
 };
+
 export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
-  const [products, setProducts] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("Pizza");
+  const { t } = useTranslation("common");
+  const [products, setProducts] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -40,18 +48,32 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
   const { selectedProducts } = useAuth();
   const categoryService = new CategoryService();
 
-  function updateProductsDisplay() {
-    let data = products.filter((p: any) => p?.category == selectedCategory);
-    setFilteredProducts(data);
-  }
+  // function updateProductsDisplay() {
+  //   let data = products.filter((p: any) => p?.category == selectedCategory);
+  //   setFilteredProducts(data);
+  // }
 
-  function fetchProducts() {
-    let data = productService.getBySnackId(snackId).then((response: any) => {
-      setProducts(response);
-      // updateProductsDisplay();
-      setLoading(false);
-    });
-  }
+  // const categories = useMemo(
+  //   () => [
+  //     { key: "pizza" as const, emoji: "🍕" },
+  //     { key: "tacos" as const, emoji: "🌮" },
+  //     { key: "burger" as const, emoji: "🍔" },
+  //     { key: "drinks" as const, emoji: "🍹" },
+  //     { key: "dessert" as const, emoji: "🍰" }
+  //   ],
+  //   []
+  // );
+
+  const updateProductsDisplay = () => {
+    const data = products.filter((p: any) => p?.category === selectedCategory);
+    setFilteredProducts(data);
+  };
+
+  const fetchProducts = async () => {
+    const response = await productService.getBySnackId(snackId);
+    setProducts(response!);
+    setLoading(false);
+  };
 
 
   async function fetchCategories() {
@@ -66,17 +88,16 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
 
   useEffect(() => {
     updateProductsDisplay();
-  }, [selectedCategory, loading]);
-
-  useEffect(() => {}, [filteredProducts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, loading, products]);
 
   return (
   <div>
-      <div className="text-white p-2">
+      <div className="text-white p-2 ">
         <header className="text-center mb-10">
           <h1
-            className="text-5xl text-red-500
-               font-bold mb-2 hidden"
+            className="text-5xl text-red-500 hidden
+               font-bold mb-2 "
           >
             Menu
           </h1>
@@ -133,12 +154,16 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
           <Card key={product.id} isOrderForm={true} product={product} />
         ))}
       </div>
+
+
       <button
         onClick={next}
-        className="bg-red-500 text-white px-4 py-2 rounded block m-auto mt-10 cursor-pointer"
-        disabled={selectedProducts.length == 0}
+        className="bg-red-500 text-white px-4 py-2 rounded block m-auto mt-10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={selectedProducts.length === 0}
+        aria-disabled={selectedProducts.length === 0}
+        title={selectedProducts.length === 0 ? t("checkout.select_one_hint") : ""}
       >
-        Valider les produits
+        {t("checkout.validate_products")}
       </button>
     </div>
   );

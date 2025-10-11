@@ -36,7 +36,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
               : new Date(),
           } as Notification;
 
-          // ✅ Only trigger sound + alert after initial load
           if (!isInitialLoad.current && newNotif.type === "order") {
             const audio = new Audio("/sounds/cashier.mp3");
             audio.play().catch((err) => console.error("Sound error:", err));
@@ -69,7 +68,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
         }
       });
 
-      // 🔑 After first snapshot, mark as loaded
       if (isInitialLoad.current) {
         isInitialLoad.current = false;
       }
@@ -82,7 +80,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
 
   return (
     <div className="relative">
-      {/* Notification button */}
       <button
         onClick={() => setOpen(!open)}
         className="relative inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-950 focus:outline-none"
@@ -95,7 +92,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
         )}
       </button>
 
-      {/* Dropdown */}
       {open && (
         <div className="absolute right-0 mt-2 z-20 w-80 max-w-sm bg-white divide-y divide-gray-100 rounded-lg shadow-lg">
           <div className="block px-4 py-2 font-medium text-center text-gray-900 rounded-t-lg bg-gray-50">
@@ -130,6 +126,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
             href="#"
             className="block py-2 text-sm font-medium text-center text-gray-900 rounded-b-lg bg-gray-50 hover:bg-gray-100"
           >
+        
             View all
           </a>
         </div>

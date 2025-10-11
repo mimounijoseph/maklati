@@ -113,7 +113,6 @@ const OrderModal: FC<OrderModalProps> = ({ docId, onClose, onDeleted }) => {
                   </p>
                 </div>
 
-                {/* Products list */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     Products

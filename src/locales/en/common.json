@@ -1,0 +1,89 @@
+{
+  "appName": "Snack Menu",
+  "hello": "Welcome, {{name}}!",
+  "currency_mad": "{{value, number(mad)}}",
+  "add_to_cart": "Add to cart",
+  "brand": "maklati",
+  "menu": "Menu",
+  "snacks": "Snacks",
+  "about": "About",
+  "contact": "Contact",
+  "login": "Login",
+  "signup": "Sign up",
+  "logout": "Logout",
+  "logout_success_title": "Success!",
+  "logout_success_msg": "You're logged out",
+  "hero": {
+    "title_line1": "Easily Share Menus,",
+    "title_line2": "Instantly Delight Customers",
+    "words": ["Easy", "Fast", "Delicious", "Seamless", "Interactive", "Modern", "Convenient"],
+    "cta": "Start now",
+    "image_alt": "Burger with fries on a tray"
+  },
+   "footer": {
+    "brand": "maklati",
+    "description": "Your favorite snack online 🍔🍟. Order easily and enjoy wherever you are.",
+    "quick_links": "Quick Links",
+    "links": {
+      "home": "Home",
+      "snacks": "Snacks",
+      "about": "About",
+      "contact": "Contact"
+    },
+    "follow_us": "Follow Us",
+    "socials": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "tiktok": "TikTok"
+    },
+    "copyright": "All rights reserved.",
+    "legal": {
+      "terms": "Terms of Use",
+      "privacy": "Privacy Policy",
+      "mentions": "Legal Mentions"
+    }
+  },
+  "products": {
+    "title": "Menu",
+    "subtitle": "Choose your favorite category",
+    "loading": "Getting things ready…",
+    "order_now": "Order now",
+    "empty": "No items in this category yet.",
+    "categories": {
+      "pizza": "Pizza",
+      "tacos": "Tacos",
+      "burger": "Burger",
+      "drinks": "Drinks",
+      "dessert": "Dessert"
+    }
+  },
+  "menuPage": {
+    "title": "Snacks",
+    "search_placeholder": "Search by name",
+    "loading": "Getting things ready…",
+    "empty": "No snacks found."
+  },
+  "checkout": {
+    "validate_products": "Confirm products",
+    "select_one_hint": "Select at least one item",
+     "steps": ["Add your order", "Validate your order", "Wait for your order"]
+  },
+  "orderReview": {
+    "title": "Your order details",
+    "qty_one": "{{count}} unit",
+    "qty_other": "{{count}} units",
+    "line_total": "Line total",
+    "total": "Total",
+    "back": "Back",
+    "confirm": "Confirm"
+  },
+  "orderConfirmation": {
+    "creating_title": "Order Creation!",
+    "creating_message": "Please wait",
+    "creating_loading": "⌛ In progress...",
+    "done_title": "Order number is {{num}}",
+    "done_message": "Thank you for your order",
+    "done_loading": "⌛ Your order will be prepared as soon as possible",
+    "img_alt": "Fast food cooking animation"
+  }
+}
