@@ -48,22 +48,6 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
   const { selectedProducts } = useAuth();
   const categoryService = new CategoryService();
 
-  // function updateProductsDisplay() {
-  //   let data = products.filter((p: any) => p?.category == selectedCategory);
-  //   setFilteredProducts(data);
-  // }
-
-  // const categories = useMemo(
-  //   () => [
-  //     { key: "pizza" as const, emoji: "🍕" },
-  //     { key: "tacos" as const, emoji: "🌮" },
-  //     { key: "burger" as const, emoji: "🍔" },
-  //     { key: "drinks" as const, emoji: "🍹" },
-  //     { key: "dessert" as const, emoji: "🍰" }
-  //   ],
-  //   []
-  // );
-
   const updateProductsDisplay = () => {
     const data = products.filter((p: any) => p?.category === selectedCategory);
     setFilteredProducts(data);

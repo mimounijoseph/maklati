@@ -9,7 +9,6 @@ export const OrderConfirmation = () => {
   const { t } = useTranslation("common");
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
 
-  // محتوى افتراضي قبل ما يجيب الطلب
   const content = useMemo(
     () =>
       orderNumber == null
@@ -45,15 +44,16 @@ export const OrderConfirmation = () => {
   }
 
   useEffect(() => {
-    let interval: number | undefined;
+    // 👇 Force the browser type
+    let interval: ReturnType<typeof setInterval> | null = null;
 
     if (orderNumber == null) {
-      interval = window.setInterval(fetchOrder, 1000);
+      interval = setInterval(fetchOrder, 1000);
       fetchOrder();
     }
 
     return () => {
-      if (interval !== undefined) window.clearInterval(interval);
+      if (interval) clearInterval(interval as unknown as number);
     };
   }, [orderNumber]);
 
