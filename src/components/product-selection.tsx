@@ -40,7 +40,7 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
 
   const fetchProducts = async () => {
     const response = await productService.getBySnackId(snackId);
-    setProducts(response);
+    setProducts(response!);
     setLoading(false);
   };
 

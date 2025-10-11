@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import i18n from "@/i18n.client";
 
 type Lng = "en" | "fr" | "ar";

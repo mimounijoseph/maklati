@@ -13,11 +13,11 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../config/firebase";
 import { Order } from "@/interfaces/order";
-<<<<<<< HEAD
+// <<<<<<< HEAD
 import { useTranslation } from "react-i18next";
-=======
+// =======
 import { Price, useCurrency } from "@/context/currencyContext";
->>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
+// >>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
 
 type OrderReviewProps = {
   next: () => void;
@@ -40,9 +40,9 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
     snackId: snackId,
   });
 
-<<<<<<< HEAD
-  const showToast = (
-=======
+// <<<<<<< HEAD
+//   const showToast = (
+// =======
   async function addOrder() {
     try {
       const ordersRef = collection(db, "orders");
@@ -95,7 +95,7 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
   }
 
   function showToast(
->>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
+// >>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
     title: string,
     message: string,
     variant:
@@ -105,7 +105,7 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
       | "warning"
       | "info"
       | undefined
-  ) => {
+  ){
     toast({
       title,
       description: message,
@@ -131,47 +131,47 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
     calculTotal();
   }, [selectedProducts]);
 
-  async function addOrder() {
-    try {
-      const ordersRef = collection(db, "orders");
-      const q = query(ordersRef, orderBy("number", "desc"), limit(1));
-      const querySnapshot = await getDocs(q);
+  // async function addOrder() {
+  //   try {
+  //     const ordersRef = collection(db, "orders");
+  //     const q = query(ordersRef, orderBy("number", "desc"), limit(1));
+  //     const querySnapshot = await getDocs(q);
 
-      let newNumber = 1;
-      if (!querySnapshot.empty) {
-        const lastOrder = querySnapshot.docs[0].data();
-        newNumber = (lastOrder.number || 0) + 1;
-      }
+  //     let newNumber = 1;
+  //     if (!querySnapshot.empty) {
+  //       const lastOrder = querySnapshot.docs[0].data();
+  //       newNumber = (lastOrder.number || 0) + 1;
+  //     }
 
-      const newOrder = {
-        ...formData,
-        products: selectedProducts,
-        total: total,
-        userUID: auth.currentUser?.uid,
-        number: newNumber,
-      };
+  //     const newOrder = {
+  //       ...formData,
+  //       products: selectedProducts,
+  //       total: total,
+  //       userUID: auth.currentUser?.uid,
+  //       number: newNumber,
+  //     };
 
-      const docRef = await addDoc(ordersRef, newOrder);
+  //     const docRef = await addDoc(ordersRef, newOrder);
 
-      showToast(
-        "Confirmed",
-        "Your order will be prepared as soon as possible 😊",
-        "success"
-      );
+  //     showToast(
+  //       "Confirmed",
+  //       "Your order will be prepared as soon as possible 😊",
+  //       "success"
+  //     );
 
-      await addDoc(collection(db, "notifications"), {
-        orderId: docRef.id,
-        restaurantId: newOrder.snackId,
-        title: `New Order #${newOrder.number}`,
-        message: `${auth.currentUser?.displayName || "Client"} ordered, total: ${newOrder.total}`,
-        createdAt: new Date(),
-        read: false,
-        type: "order",
-      });
-    } catch (error) {
-      console.error("Error adding order: ", error);
-    }
-  }
+  //     await addDoc(collection(db, "notifications"), {
+  //       orderId: docRef.id,
+  //       restaurantId: newOrder.snackId,
+  //       title: `New Order #${newOrder.number}`,
+  //       message: `${auth.currentUser?.displayName || "Client"} ordered, total: ${newOrder.total}`,
+  //       createdAt: new Date(),
+  //       read: false,
+  //       type: "order",
+  //     });
+  //   } catch (error) {
+  //     console.error("Error adding order: ", error);
+  //   }
+  // }
 
   const fmt = (value: number) => t("currency_mad", { value });
 
@@ -184,7 +184,7 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
       <ul className="mb-4">
         {selectedProducts.map((product: any) =>
           product?.cost.map((p: any, index: number) => {
-<<<<<<< HEAD
+// <<<<<<< HEAD
             if (p.quantity <= 0) return null;
 
             const lineTotal = p.quantity * p.price;
@@ -227,7 +227,7 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
                         >
                           +
                         </button>
-=======
+{/* =======
             return (
               p.quantity > 0 && (
                 // <li key={product.id}>
@@ -272,22 +272,22 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
                             from={currency}
                           />
                         </span>
->>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
+>>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b */}
                       </div>
 
                       <span className="ml-2">
                         {t("orderReview.line_total")}: {fmt(lineTotal)}
                       </span>
                     </div>
-<<<<<<< HEAD
+{/* <<<<<<< HEAD */}
                   </div>
                 </dl>
               </div>
-=======
-                  </dl>
-                </div>
-              )
->>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
+// =======
+//                   </dl>
+//                 </div>
+//               )
+// >>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
             );
           })
         )}
@@ -303,13 +303,13 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
           </button>
 
           <button
-<<<<<<< HEAD
+// <<<<<<< HEAD
             onClick={async () => {
               await addOrder();
-=======
-            onClick={() => {
-              addOrder();
->>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
+// =======
+//             onClick={() => {
+//               addOrder();
+// >>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
               next();
             }}
             className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer"
@@ -317,14 +317,14 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
             {t("orderReview.confirm")}
           </button>
         </div>
-<<<<<<< HEAD
+{/* <<<<<<< HEAD */}
 
         <p className="text-red-700 text-2xl">
           {t("orderReview.total")} : {fmt(total)}
-=======
-        <p className="text-red-700 text-2xl">
+{/* ======= */}
+        {/* <p className="text-red-700 text-2xl">
           Total : <Price amount={total} from={currency} />
->>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b
+>>>>>>> f06d193130d2fa889d4319b682836ee5ee9ae30b */}
         </p>
       </div>
     </div>
