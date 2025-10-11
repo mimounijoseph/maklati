@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 
 export const OrderConfirmation = () => {
   const { t } = useTranslation("common");
-
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
 
   // محتوى افتراضي قبل ما يجيب الطلب
@@ -27,7 +26,8 @@ export const OrderConfirmation = () => {
     [orderNumber, t]
   );
 
-  const pollRef = useRef<NodeJS.Timer | null>(null);
+  // ✅ FIX: Use the correct type that works in both browser & Node
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   async function fetchOrder() {
     try {
@@ -50,6 +50,8 @@ export const OrderConfirmation = () => {
       pollRef.current = setInterval(fetchOrder, 1000);
       fetchOrder();
     }
+
+    // cleanup when component unmounts or orderNumber updates
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
@@ -64,4 +66,3 @@ export const OrderConfirmation = () => {
     </div>
   );
 };
-

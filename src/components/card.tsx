@@ -150,7 +150,7 @@ function Card({ product, isOrderForm }: CardTypes) {
           {isOrderForm && (
             <>
               <div className=" bg-white ">
-                <div className="mt-4 flex items-center justify-center gap-2">
+                <div className="mt-4 flex items-center  gap-2">
                   {sizes.map((s: any) => {
                     const active = selectedSize === s;
                     return (
@@ -158,11 +158,11 @@ function Card({ product, isOrderForm }: CardTypes) {
                         key={s}
                         type="button"
                         onClick={() => toggleSize(s)}
-                        className={`relative inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-medium transition-all
-                      ring-1 focus:outline-none focus-visible:ring-2
+                        className={`relative inline-flex items-center justify-center rounded-md px-2  text-sm font-medium transition-all
+                      ring-2 focus:outline-none focus-visible:ring-2
                       ${
                         active
-                          ? "bg-slate-900 text-white ring-slate-900 shadow-[0_6px_20px_rgba(17,24,39,0.35)]"
+                          ? "bg-slate-900 text-white "
                           : "bg-white/80 text-slate-800 ring-slate-200 hover:bg-slate-100"
                       }`}
                         aria-pressed={active}
@@ -173,22 +173,22 @@ function Card({ product, isOrderForm }: CardTypes) {
                   })}
                 </div>
 
-                <div className="mt-2 flex items-center justify-center gap-4">
+                <div className="mt-2 flex items-center justify-center bg-gray-100 px-1 py-0.5  w-14 rounded-full ">
                   <button
                     onClick={decrement}
-                    className="w-9 h-9 text-lg font-bold text-white bg-red-500 rounded-full
-                           hover:bg-red-600 active:scale-95 transition"
+                    className="w-5 h-5 text-xs font-semibold text-gray-900 bg-white rounded-full
+                           hover:bg-whiteactive:scale-95 transition"
                     aria-label="Decrease quantity"
                   >
                     −
                   </button>
-                  <span className="min-w-8 text-lg font-semibold text-slate-900 text-center">
+                  <span className="min-w-4 text-sm font-semibold text-slate-900 text-center">
                     {qty}
                   </span>
                   <button
                     onClick={increment}
-                    className="w-9 h-9 text-lg font-bold text-white bg-emerald-600 rounded-full
-                           hover:bg-emerald-700 active:scale-95 transition"
+                    className="w-5 h-5 text-xs font-semibold text-white bg-orange-500 rounded-full
+                           hover:bg-orange-600 active:scale-95 transition"
                     aria-label="Increase quantity"
                   >
                     +
@@ -199,11 +199,11 @@ function Card({ product, isOrderForm }: CardTypes) {
                 <div className="mt-2 flex justify-center">
                   <button
                     onClick={addToCart}
-                    className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5
-                           bg-emerald-600 text-white font-semibold
+                    className="inline-flex items-center justify-center  rounded-md px-2 py-1 w-full
+                           bg-orange-500 text-white text-sm font-semibold
                            shadow-[0_0_0_2px_rgba(16,185,129,0.25),0_10px_30px_rgba(16,185,129,0.4)]
-                           hover:bg-emerald-700 active:scale-[0.98] transition focus-visible:outline-none
-                           focus-visible:ring-2 focus-visible:ring-emerald-400/70"
+                           hover:bg-orange-600 active:scale-[0.98] transition focus-visible:outline-none
+                            "
                   >
                     Add to order
                   </button>
