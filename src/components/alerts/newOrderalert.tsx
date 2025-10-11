@@ -7,7 +7,7 @@ type NewOrderAlertProps = {
 };
 
 const NewOrderAlert: React.FC<NewOrderAlertProps> = ({ message }) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     // Trigger animation on mount

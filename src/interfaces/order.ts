@@ -6,4 +6,5 @@ export interface Order{
     total?:any,
     userUID?:any,
     snackId?:any
+    status?:string
 }

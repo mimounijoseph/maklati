@@ -23,6 +23,7 @@ interface Plat {
 const PlatModal: FC<PlatModalProps> = ({ docId, onClose, onDeleted }) => {
   const [plat, setPlat] = useState<Plat | null>(null);
   const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState<string>("");
 
   useEffect(() => {
     if (!docId) return;
@@ -32,6 +33,8 @@ const PlatModal: FC<PlatModalProps> = ({ docId, onClose, onDeleted }) => {
         const snap = await getDoc(doc(db, "plat", docId));
         if (snap.exists()) {
           setPlat(snap.data() as Plat);
+          const catsnap =  await getDoc(doc(db, "categories", snap.data().category));
+          setCategory(catsnap.exists() ? (catsnap.data() as {name: string}).name : "Uncategorized");
         }
       } catch (err) {
         console.error("Error fetching plat:", err);
@@ -111,7 +114,7 @@ const PlatModal: FC<PlatModalProps> = ({ docId, onClose, onDeleted }) => {
                         Category
                       </dt>
                       <dd className="text-base font-semibold text-gray-900 dark:text-white">
-                        {plat.category ?? "Uncategorized"}
+                        {category ?? "Uncategorized"}
                       </dd>
                     </div>
                     <div>

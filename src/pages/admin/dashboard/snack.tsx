@@ -3,12 +3,13 @@ import React, { FC } from "react";
 import Sidebar from "./sidebar";
 import SnackInfo from "@/components/snackinfo";
 import QrCodeGenerator from "@/components/qrcode/index";
-
+import ProtectedLayout from "@/guard/protectedPage";
 
 
 
 const Snack: FC = () => {
   return (
+  
     <div className="admin mt-14 bg-white" style={{ fontFamily: "sans-serif" }}>
       <Sidebar />
         <div className="min-h-screen p-4 sm:ml-64">
@@ -45,6 +46,7 @@ const Snack: FC = () => {
         </div>
 
     </div>
+  
       );
     };
     

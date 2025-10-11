@@ -110,9 +110,9 @@ const RevenueChart = () => {
           </h5>
           <p className="text-sm text-gray-500">Revenue Over Time</p>
         </div>
-        <a href="#" className="text-sm font-medium text-blue-600">
+        {/* <a href="#" className="text-sm font-medium text-blue-600">
           View report
-        </a>
+        </a> */}
       </div>
       <div id="revenue-chart" className="w-full h-48"></div>
     </div>

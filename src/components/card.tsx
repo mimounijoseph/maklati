@@ -114,13 +114,13 @@ function Card({ product, isOrderForm }: CardTypes) {
   if (product.status)
     return (
       <SpotlightCard
-        className={`w-80 rounded-2xl bg-white/70 backdrop-blur-md
+        className={`w-44 rounded-2xl bg-white/70 backdrop-blur-md
               ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(17,24,39,0.12)]
               hover:shadow-[0_16px_40px_rgba(17,24,39,0.15)] transition-shadow
               ${isOrderForm ? "h-[520px]" : "h-[350px]"}`}
         spotlightColor="34, 211, 238"
       >
-        <div className="w-full h-full flex flex-col p-4">
+        <div className="w-full h-full flex flex-col ">
           <div className="relative flex items-center justify-center">
             <img
               src={product.urlPhoto ?? "/images.jpg"}
@@ -149,7 +149,7 @@ function Card({ product, isOrderForm }: CardTypes) {
 
           {isOrderForm && (
             <>
-              <div className="mt-auto">
+              <div className="mt-4">
                 <div className="mt-4 flex items-center justify-center gap-2">
                   {sizes.map((s: any) => {
                     const active = selectedSize === s;
@@ -173,7 +173,7 @@ function Card({ product, isOrderForm }: CardTypes) {
                   })}
                 </div>
 
-                <div className="mt-4 flex items-center justify-center gap-4">
+                <div className="mt-2 flex items-center justify-center gap-4">
                   <button
                     onClick={decrement}
                     className="w-9 h-9 text-lg font-bold text-white bg-red-500 rounded-full
@@ -196,7 +196,7 @@ function Card({ product, isOrderForm }: CardTypes) {
                 </div>
 
                 {/* CTA */}
-                <div className="mt-4 flex justify-center">
+                <div className="mt-2 flex justify-center">
                   <button
                     onClick={addToCart}
                     className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5
@@ -209,7 +209,7 @@ function Card({ product, isOrderForm }: CardTypes) {
                   </button>
                 </div>
               </div>
-              <div className="absolute top-1 right-1">
+              {/* <div className="absolute top-1 right-1">
                 <button className="relative inline-flex items-center  text-sm font-medium text-center text-white  focus:ring-4 focus:outline-none">
                   <img
                     src="/plat.png"
@@ -221,7 +221,7 @@ function Card({ product, isOrderForm }: CardTypes) {
                     {totalProduct}
                   </div>
                 </button>
-              </div>
+              </div> */}
             </>
           )}
         </div>

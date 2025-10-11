@@ -3,12 +3,19 @@
 import React, { FC, useEffect, useState } from "react";
 import Sidebar from "../../sidebar"; // adjust if needed
 import { useParams } from "next/navigation";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, updateDoc,getDocs } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import  { useRouter } from "next/router";
 import { Plat } from "@/interfaces/product";
 import PexelsSearchModal from "@/components/pexelsSearch";
 import Spinner from "@/components/spinner";
+import { CategoryService } from "@/services/CategoryService";
+
+
+type Category  = {
+  id:string,
+  name:string
+}
 
 const EditPlat: FC = () => {
   const router = useRouter();
@@ -27,9 +34,28 @@ const EditPlat: FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+   const categoryService = new CategoryService();
+  
+
+
 
   // ✅ Fetch plat by docId
   useEffect(() => {
+    
+          const fetchCategories = async () => {
+          const querySnapshot = await getDocs(collection(db, "categories"));
+          const cats: Category[] = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Category[];
+          setCategories(cats);
+        };
+    
+        fetchCategories();
+
+
     const fetchPlat = async () => {
       try {
         if (!docId) return;
@@ -184,13 +210,11 @@ const EditPlat: FC = () => {
                   required
                 >
                   <option value="">Select category</option>
-                  <option value="appetizers">Appetizers</option>
-                  <option value="main_courses">Main Courses</option>
-                  <option value="desserts">Desserts</option>
-                  <option value="beverages">Beverages</option>
-                  <option value="pizzas">Pizzas</option>
-                  <option value="burgers">Burgers</option>
-                  <option value="sandwiches">Sandwiches</option>
+                      {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
                 </select>
               </div>
 

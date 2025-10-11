@@ -182,15 +182,26 @@ ul{
   }
 }
 
+/* globals.css or index.css */
+.no-scrollbar::-webkit-scrollbar {
+  height: 6px;   /* adjust thickness for horizontal */
+}
 
-/* Add to your global CSS file */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+.no-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* hides track */
 }
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari, Opera */
+
+.no-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb; /* Tailwind gray-200 = #e5e7eb */
+  border-radius: 9999px;     /* full rounded */
+  margin-top: 4px;
 }
+
+.no-scrollbar {
+  scrollbar-width: thin;        /* Firefox */
+  scrollbar-color: #e5e7eb transparent;
+}
+
 
 
 .admin {

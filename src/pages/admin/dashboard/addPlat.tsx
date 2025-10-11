@@ -1,10 +1,17 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState,useEffect } from "react";
+
 import Sidebar from "./sidebar";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc,getDocs,doc } from "firebase/firestore";
 import { db, auth } from "../../../config/firebase"; 
+import ProtectedLayout from "@/guard/protectedPage";
 import { Plat } from "@/interfaces/product";
 import PexelsSearchModal from "@/components/pexelsSearch";
 import Spinner from "../../../components/spinner";
+
+type Category  = {
+  id:string,
+  name:string
+}
 
 const AddPlat: FC = () => {
   // Updated form state
@@ -17,9 +24,25 @@ const AddPlat: FC = () => {
     cost: [],
     urlPhoto: "",
   });
-
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+
+
+  //useEffect used to fetch categories from firestore
+  useEffect(()=>{
+
+      const fetchCategories = async () => {
+      const querySnapshot = await getDocs(collection(db, "categories"));
+      const cats: Category[] = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Category[];
+      setCategories(cats);
+    };
+
+    fetchCategories();
+  },[])
 
   // Add a new size-price row
   const addCostRow = () => {
@@ -105,6 +128,7 @@ const AddPlat: FC = () => {
   };
 
   return (
+     
     <div className="admin min-h-screen bg-gray-50" style={{ fontFamily: "Roboto, sans-serif" }}>
       <Sidebar />
       <div className="p-6 sm:ml-64">
@@ -136,25 +160,25 @@ const AddPlat: FC = () => {
               </div>
 
               {/* Category */}
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">Category</label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
-                  required
-                >
-                  <option value="">Select category</option>
-                  <option value="appetizers">Appetizers</option>
-                  <option value="main_courses">Main Courses</option>
-                  <option value="desserts">Desserts</option>
-                  <option value="beverages">Beverages</option>
-                  <option value="pizzas">Pizzas</option>
-                  <option value="burgers">Burgers</option>
-                  <option value="sandwiches">Sandwiches</option>
-                </select>
-              </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Category
+                  </label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
+                    required
+                  >
+                    <option value="">Select category</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
               {/* Description */}
               <div className="md:col-span-2">
@@ -249,6 +273,7 @@ const AddPlat: FC = () => {
         </div>
       </div>
     </div>
+   
   );
 };
 

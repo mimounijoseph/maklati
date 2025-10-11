@@ -31,6 +31,7 @@ export const OrderReview = ({ next, prev, snackId }: OrderReviewProps) => {
     total: null,
     userUID: null,
     snackId: snackId,
+    status: "Pending",
   });
 
   async function addOrder() {

@@ -16,6 +16,7 @@ import {
 import { db } from "../../../config/firebase";
 import OrderModal from "../../../components/orderModal";
 import { Eye } from "lucide-react";
+import ProtectedLayout from "@/guard/protectedPage";
 
 interface Product {
   id: string;
@@ -169,6 +170,7 @@ const Orders: FC = () => {
 
 
   return (
+      
     <div className="admin" style={{ fontFamily: "sans-serif" }}>
       <Sidebar />
       <div className="bg-gray-50 sm:ml-64">
@@ -250,17 +252,17 @@ const Orders: FC = () => {
                     <button
                       key={status}
                       onClick={() => setStatusFilter(status)}
-                      className={`text-xs font-medium px-2.5 py-0.5 rounded-sm border
+                      className={`text-sm font-medium  rounded-md border px-2 py-1 mt-2
                         ${
                           statusFilter === status
                             ? status === "Pending"
-                              ? "bg-red-100 text-red-700 border-red-300"
+                              ? "bg-red-100 text-red-700 border-red-200 shadow-md "
                               : status === "In Progress"
-                              ? "bg-yellow-100 text-yellow-500 border-yellow-300"
+                              ? "bg-yellow-100 text-yellow-500 border-yellow-200 shadow-md "
                               : status === "Completed"
-                              ? "bg-green-100 text-green-700 border-green-300"
-                              : "bg-gray-200 text-gray-800 border-gray-500"
-                            : "bg-gray-50 text-gray-500 border-gray-300 hover:bg-gray-200"
+                              ? "bg-green-100 text-green-700 border-green-300 shadow-md "
+                              : "bg-white text-gray-950 border-gray-700 shadow-md "
+                            : "bg-white text-gray-500 border-gray-300 hover:bg-gray-200 "
                         }
                       `}
                     >
@@ -325,7 +327,7 @@ const Orders: FC = () => {
                           <div className="ps-3">
                             <div className="text-base font-semibold">
                               {firstProduct?.name}{" "}
-                              <span className="text-gray-500 text-sm">({firstProduct?.category})</span>
+                              {/* <span className="text-gray-500 text-sm">({firstProduct?.category})</span> */}
                             </div>
                             {moreCount > 0 && <div className="text-sm text-gray-500">+{moreCount} more</div>}
                           </div>
@@ -333,7 +335,7 @@ const Orders: FC = () => {
                           <td className="px-6 py-4">
                             <span
                               className={`px-2 py-1 text-xs font-medium rounded-md
-                                ${order.status === "Pending" ? "bg-red-100 text-red-700" : ""}
+                                ${order.status === "Pending" ? "bg-red-100 text-red-500" : ""}
                                 ${order.status === "In Progress" ? "bg-yellow-100 text-yellow-700" : ""}
                                 ${order.status === "Completed" ? "bg-green-100 text-green-700" : ""}
                               `}
@@ -430,6 +432,7 @@ const Orders: FC = () => {
         />
       )}
     </div>
+   
   );
 };
 

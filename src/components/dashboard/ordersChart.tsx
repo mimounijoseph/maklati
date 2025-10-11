@@ -116,9 +116,9 @@ const OrdersChart = () => {
           <h5 className="text-3xl font-bold text-gray-900">{totalOrders}</h5>
           <p className="text-sm text-gray-500">Orders Over Time</p>
         </div>
-        <a href="#" className="text-sm font-medium text-blue-600">
+        {/* <a href="#" className="text-sm font-medium text-blue-600">
           View report
-        </a>
+        </a> */}
       </div>
       <div id="orders-chart" className="w-full h-48"></div>
     </div>
