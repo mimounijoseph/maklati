@@ -2,7 +2,7 @@
 
 import { collection, where, query, orderBy, limit, getDocs } from "firebase/firestore";
 import { db, auth } from "../config/firebase";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export const OrderConfirmation = () => {
@@ -26,34 +26,34 @@ export const OrderConfirmation = () => {
     [orderNumber, t]
   );
 
-  // ✅ FIX: Use the correct type that works in both browser & Node
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
   async function fetchOrder() {
     try {
       const uid = auth.currentUser?.uid;
       if (!uid) return;
+
       const ordersRef = collection(db, "orders");
       const q = query(ordersRef, where("userUID", "==", uid), orderBy("number", "desc"), limit(1));
       const snap = await getDocs(q);
+
       if (!snap.empty) {
         const lastOrder = snap.docs[0].data() as { number?: number };
         if (lastOrder?.number) setOrderNumber(lastOrder.number);
       }
     } catch (error) {
-      console.error("Error fetching order: ", error);
+      console.error("Error fetching order:", error);
     }
   }
 
   useEffect(() => {
+    let interval: number | undefined;
+
     if (orderNumber == null) {
-      pollRef.current = setInterval(fetchOrder, 1000);
+      interval = window.setInterval(fetchOrder, 1000);
       fetchOrder();
     }
 
-    // cleanup when component unmounts or orderNumber updates
     return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
+      if (interval !== undefined) window.clearInterval(interval);
     };
   }, [orderNumber]);
 
