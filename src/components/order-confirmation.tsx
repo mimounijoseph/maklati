@@ -44,16 +44,15 @@ export const OrderConfirmation = () => {
   }
 
   useEffect(() => {
-    // 👇 Force the browser type
-    let interval: ReturnType<typeof setInterval> | null = null;
+    let intervalId: number;
 
     if (orderNumber == null) {
-      interval = setInterval(fetchOrder, 1000);
+      intervalId = window.setInterval(fetchOrder, 1000);
       fetchOrder();
     }
 
     return () => {
-      if (interval) clearInterval(interval as unknown as number);
+      window.clearInterval(intervalId);
     };
   }, [orderNumber]);
 
