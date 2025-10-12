@@ -61,9 +61,18 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
 
 
   async function fetchCategories() {
-      const data = await categoryService.getAll();
-      setCategories(data);  
-    }
+    const data = await categoryService.getAll();
+
+    // Ensure each category has an icon, and fix type compatibility
+    const formatted = data.map((cat: any) => ({
+      id: cat.id,
+      name: cat.name,
+      icon: cat.icon || "🍽️", // fallback icon
+    }));
+
+    setCategories(formatted);
+  }
+
 
   useEffect(() => {
     fetchProducts();
