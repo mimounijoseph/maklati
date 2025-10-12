@@ -123,14 +123,23 @@ const Toast: React.FC<ToastProps> = ({
     isDragging.current = false;
   }, [translateX, handleClose]);
 
-  const wrappedAction = action ? React.cloneElement(action as React.ReactElement, {
-    onClick: (e: React.MouseEvent) => {
-      e.stopPropagation();
-      const originalOnClick = (action as React.ReactElement).props.onClick;
-      if (originalOnClick) originalOnClick(e);
-      handleClose();
-    }
-  }) : null;
+const wrappedAction =
+  React.isValidElement(action)
+    ? React.cloneElement(
+        action as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>,
+        {
+          onClick: (e: React.MouseEvent) => {
+            e.stopPropagation();
+            const originalOnClick = (action as React.ReactElement<{
+              onClick?: (e: React.MouseEvent) => void;
+            }>).props.onClick;
+            if (originalOnClick) originalOnClick(e);
+            handleClose();
+          },
+        }
+      )
+    : null;
+
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
