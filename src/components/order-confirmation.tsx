@@ -44,17 +44,20 @@ export const OrderConfirmation = () => {
   }
 
   useEffect(() => {
-    let intervalId: number;
+    let interval: ReturnType<typeof setInterval> | undefined;
 
     if (orderNumber == null) {
-      intervalId = window.setInterval(fetchOrder, 1000);
       fetchOrder();
+      interval = setInterval(fetchOrder, 1000);
     }
 
     return () => {
-      window.clearInterval(intervalId);
+      if (interval) {
+        clearInterval(interval);
+      }
     };
   }, [orderNumber]);
+
 
   return (
     <div className="text-center bg-white/70 w-fit m-auto rounded-3xl px-10 py-5">
