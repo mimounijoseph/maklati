@@ -52,12 +52,9 @@ export const OrderConfirmation = () => {
     }
 
     return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
+      if (interval) clearInterval(interval);
     };
   }, [orderNumber]);
-
 
   return (
     <div className="text-center bg-white/70 w-fit m-auto rounded-3xl px-10 py-5">
