@@ -36,9 +36,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <CurrencyProvider>
           <AuthProvider>
             <main className={lang === "ar" ? tajawal.className : ""}>
-              <Layout>
+              {/* <Layout> */}
                 <Component {...pageProps} />
-              </Layout>
+              {/* </Layout> */}
             </main>
           </AuthProvider>
         </CurrencyProvider>

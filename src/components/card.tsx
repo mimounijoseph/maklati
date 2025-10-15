@@ -117,7 +117,7 @@ function Card({ product, isOrderForm }: CardTypes) {
         className={`w-44 rounded-2xl bg-white/70 backdrop-blur-md
               ring-1 ring-slate-200 shadow-[0_10px_30px_rgba(17,24,39,0.12)]
               hover:shadow-[0_16px_40px_rgba(17,24,39,0.15)] transition-shadow
-              ${isOrderForm ? "h-[520px]" : "h-[350px]"}`}
+              ${isOrderForm ? "h-auto" : "h-auto"}`}
         spotlightColor="34, 211, 238"
       >
         <div className="w-full h-full flex flex-col ">
@@ -173,21 +173,21 @@ function Card({ product, isOrderForm }: CardTypes) {
                   })}
                 </div>
 
-                <div className="mt-2 flex items-center justify-center bg-gray-100 px-1 py-0.5  w-14 rounded-full ">
+                <div className="mt-2 flex items-center justify-between bg-gray-100 p-1  w-full rounded-full ">
                   <button
                     onClick={decrement}
-                    className="w-5 h-5 text-xs font-semibold text-gray-900 bg-white rounded-full
+                    className="w-8 h-8 text-md font-bold text-gray-900 bg-white rounded-full
                            hover:bg-whiteactive:scale-95 transition"
                     aria-label="Decrease quantity"
                   >
                     −
                   </button>
-                  <span className="min-w-4 text-sm font-semibold text-slate-900 text-center">
+                  <span className="min-w-4 text-md font-bold text-slate-900 text-center">
                     {qty}
                   </span>
                   <button
                     onClick={increment}
-                    className="w-5 h-5 text-xs font-semibold text-white bg-orange-500 rounded-full
+                    className="w-8 h-8 text-md font-bold text-white bg-orange-500 rounded-full
                            hover:bg-orange-600 active:scale-95 transition"
                     aria-label="Increase quantity"
                   >
@@ -199,9 +199,9 @@ function Card({ product, isOrderForm }: CardTypes) {
                 <div className="mt-2 flex justify-center">
                   <button
                     onClick={addToCart}
-                    className="inline-flex items-center justify-center  rounded-md px-2 py-1 w-full
+                    className="inline-flex items-center justify-center  rounded-md px-4 py-2 w-full
                            bg-orange-500 text-white text-sm font-semibold
-                           shadow-[0_0_0_2px_rgba(16,185,129,0.25),0_10px_30px_rgba(16,185,129,0.4)]
+                          
                            hover:bg-orange-600 active:scale-[0.98] transition focus-visible:outline-none
                             "
                   >
