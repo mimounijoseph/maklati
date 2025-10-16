@@ -7,8 +7,9 @@ import { useEffect, useMemo, useState } from "react";
 import Layout from "@/pages/core/layout";
 import { Loader } from "@/components/ui/loader";
 import { ProductService } from "@/services/product";
-import { Category } from "@/enums/category";
 import { useTranslation } from "react-i18next";
+import { CategoryService } from "@/services/CategoryService";
+import { Category } from "@/components/product-selection";
 
 const productService = new ProductService();
 
@@ -18,21 +19,25 @@ function Products() {
   const { id } = router.query;
 
   const [products, setProducts] = useState<any[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("Pizza");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [categories, setCategories] = useState<Category[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // 🏷️ خريطة الفئات + إيموجي + ترجمة
-  const categories: Array<{ key: keyof typeof Category; emoji: string }> = useMemo(
-    () => [
-      { key: "pizza", emoji: "🍕" },
-      { key: "tacos", emoji: "🌮" },
-      { key: "burger", emoji: "🍔" },
-      { key: "drinks", emoji: "🍹" },
-      { key: "dessert", emoji: "🍰" }
-    ],
-    []
-  );
+const categoryService = new CategoryService();
+  async function fetchCategories() {
+    const data = await categoryService.getAll();
+
+    // Ensure each category has an icon, and fix type compatibility
+    const formatted = data.map((cat: any) => ({
+      id: cat.id,
+      name: cat.name,
+      icon: cat.icon || "🍽️", // fallback icon
+    }));
+
+    setCategories(formatted);
+  }
 
   function updateProductsDisplay() {
 // <<<<<<< HEAD
@@ -61,6 +66,7 @@ function Products() {
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -87,7 +93,7 @@ function Products() {
     <Layout>
       <div
         style={{ fontFamily: "serif" }}
-        className="min-h-screen w-screen p-6 m-auto text-slate-900 bg-gradient-to-b from-amber-400 to-yellow-300"
+        className="min-h-screen w-screen p-6 m-auto text-slate-900 bg-white"
       >
         <header className="text-center mb-10">
           <h1 className="text-5xl font-bold text-black mb-1">
@@ -97,7 +103,7 @@ function Products() {
         </header>
 
         {/* Tabs / Categories */}
-        <div className="flex justify-center gap-3 mb-12">
+        {/* <div className="flex justify-center gap-3 mb-12">
           <ul className="flex sm:w-[100%] md:w-fit sm:overflow-auto -mb-px text-sm font-medium text-center text-gray-700 dark:text-black">
             {categories.map(({ key, emoji }) => {
               const keyStr = key as string;
@@ -123,7 +129,45 @@ function Products() {
               );
             })}
           </ul>
-        </div>
+        </div> */}
+          <div className="flex justify-center w-full max-w-[450px] sm:max-w-full px-4 mb-5">
+    <ul className="flex overflow-x-auto no-scrollbar text-xs font-medium text-gray-600 dark:text-black space-x-4  ">
+      {categories.map((cat) => {
+        // truncate long category names
+        const displayName =
+          cat.name.length > 10 ? cat.name.slice(0, 8) + "..." : cat.name;
+
+        return (
+          <li
+            key={cat.id}
+            className="flex-shrink-0 w-[70px] flex flex-col items-center cursor-pointer"
+            onClick={() => setSelectedCategory(cat.id)}
+          >
+            {/* Circle with Icon */}
+            <div
+              className={`w-14 h-14 flex items-center justify-center rounded-full shadow-md transition-all duration-200 ${
+                selectedCategory === cat.id
+                  ? ""
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              <span className="text-2xl">{cat.icon || "🍽️"}</span>
+            </div>
+
+            {/* Category Name */}
+            <p
+              className={`mt-2 text-center text-xs  ${
+                selectedCategory === cat.id ? "text-amber-600" : "text-gray-600"
+              }`}
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
+              {displayName}
+            </p>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
 
 {/* <<<<<<< HEAD */}
         {/* Products grid */}

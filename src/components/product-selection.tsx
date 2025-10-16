@@ -23,12 +23,11 @@ export type Product = {
 
 import { useTranslation } from "react-i18next";
 
-
-type Category  = {
-  id:string,
-  name:string,
-  icon:string
-}
+export type Category = {
+  id: string;
+  name: string;
+  icon: string;
+};
 
 const productService = new ProductService();
 
@@ -59,7 +58,6 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
     setLoading(false);
   };
 
-
   async function fetchCategories() {
     const data = await categoryService.getAll();
 
@@ -73,7 +71,6 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
     setCategories(formatted);
   }
 
-
   useEffect(() => {
     fetchProducts();
     fetchCategories();
@@ -85,7 +82,7 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
   }, [selectedCategory, loading, products]);
 
   return (
-  <div>
+    <div>
       <div className="text-white p-2 ">
         <header className="text-center mb-10">
           <h1
@@ -96,51 +93,64 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
           </h1>
         </header>
 
-     {/* Categories Section */}
-    <h2 className="text-gray-800" style={{ fontFamily: "Inter, sans-serif" }}>Menu categories</h2>
-<div className="flex justify-center gap-3 mb-4 border-y-2 border-gray-100 py-4 ">
-  <div className="flex justify-center w-full max-w-[450px] sm:max-w-full px-4  ">
-    <ul className="flex overflow-x-auto no-scrollbar text-xs font-medium text-gray-600 dark:text-black space-x-4  ">
-      {categories.map((cat) => {
-        // truncate long category names
-        const displayName =
-          cat.name.length > 10 ? cat.name.slice(0, 8) + "..." : cat.name;
+        {/* Categories Section */}
+        {/* <h2 className="text-gray-800" style={{ fontFamily: "Inter, sans-serif" }}>Menu categories</h2> */}
+        <div>
+          <img
+            src="/plat.png"
+            alt="add plat icon"
+            width={"40px"}
+            className="float-right cursor-pointer"
+            onClick={next}
+          />
+          <h1 className="text-black text-2xl text-center mb-5 font-semibold ps-3">Order now</h1>
+        </div>
+        <div className="flex justify-center gap-3 mb-4   py-4 ">
+          <div className="flex justify-center w-full max-w-[450px] sm:max-w-full px-4  ">
+            <ul className="flex overflow-x-auto no-scrollbar text-xs font-medium text-gray-600 dark:text-black space-x-4  py-2">
+              {categories.map((cat) => {
+                // truncate long category names
+                const displayName =
+                  cat.name.length > 10
+                    ? cat.name.slice(0, 8) + "..."
+                    : cat.name;
 
-        return (
-          <li
-            key={cat.id}
-            className="flex-shrink-0 w-[70px] flex flex-col items-center cursor-pointer"
-            onClick={() => setSelectedCategory(cat.id)}
-          >
-            {/* Circle with Icon */}
-            <div
-              className={`w-14 h-14 flex items-center justify-center rounded-full shadow-md transition-all duration-200 ${
-                selectedCategory === cat.id
-                  ? ""
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              <span className="text-2xl">{cat.icon || "🍽️"}</span>
-            </div>
+                return (
+                  <li
+                    key={cat.id}
+                    className="flex-shrink-0 w-[70px] flex flex-col items-center cursor-pointer"
+                    onClick={() => setSelectedCategory(cat.id)}
+                  >
+                    {/* Circle with Icon */}
+                    <div
+                      className={`w-14 h-14 flex items-center justify-center rounded-full shadow-md transition-all duration-200 ${
+                        selectedCategory === cat.id
+                          ? ""
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      <span className="text-2xl">{cat.icon || "🍽️"}</span>
+                    </div>
 
-            {/* Category Name */}
-            <p
-              className={`mt-2 text-center text-xs  ${
-                selectedCategory === cat.id ? "text-amber-600" : "text-gray-600"
-              }`}
-              style={{ fontFamily: "Inter, sans-serif" }}
-            >
-              {displayName}
-            </p>
-          </li>
-        );
-      })}
-    </ul>
-  </div>
-</div>
+                    {/* Category Name */}
+                    <p
+                      className={`mt-2 text-center text-xs  ${
+                        selectedCategory === cat.id
+                          ? "text-amber-600"
+                          : "text-gray-600"
+                      }`}
+                      style={{ fontFamily: "Inter, sans-serif" }}
+                    >
+                      {displayName}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
 
-
-    {/* the section below is displaying the selected category plats */}
+        {/* the section below is displaying the selected category plats */}
       </div>
       <div className="flex gap-2 justify-center items-start flex-wrap h-screen ">
         {filteredProducts.map((product, index) => (
@@ -148,16 +158,17 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
         ))}
       </div>
 
-
-      <button
+      {/* <button
         onClick={next}
         className="bg-red-500 text-white px-4 py-2 rounded block m-auto mt-10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={selectedProducts.length === 0}
         aria-disabled={selectedProducts.length === 0}
-        title={selectedProducts.length === 0 ? t("checkout.select_one_hint") : ""}
+        title={
+          selectedProducts.length === 0 ? t("checkout.select_one_hint") : ""
+        }
       >
         {t("checkout.validate_products")}
-      </button>
+      </button> */}
     </div>
   );
 };
