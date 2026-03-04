@@ -1,20 +1,29 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase";
 
-const OrdersChart = () => {
+type OrdersChartProps = {
+  snackId?: string;
+};
+
+const OrdersChart = ({ snackId }: OrdersChartProps) => {
   const [totalOrders, setTotalOrders] = useState<number>(0);
 
   useEffect(() => {
     const fetchDataAndRenderChart = async () => {
-      const ordersQuery = query(
-        collection(db, "orders"),
-        orderBy("date", "asc")
-      );
+      if (!snackId) {
+        setTotalOrders(0);
+        return;
+      }
+
+      const ordersQuery = query(collection(db, "orders"), where("snackId", "==", snackId));
       const snapshot = await getDocs(ordersQuery);
-      if (snapshot.empty) return;
+      if (snapshot.empty) {
+        setTotalOrders(0);
+        return;
+      }
 
       let total = 0;
       const ordersByDate: Record<string, number> = {};
@@ -107,7 +116,7 @@ const OrdersChart = () => {
     };
 
     fetchDataAndRenderChart();
-  }, []);
+  }, [snackId]);
 
   return (
     <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-4">

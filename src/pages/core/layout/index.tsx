@@ -18,8 +18,7 @@ export default function Layout({ children }: LayoutProps) {
     <ToastProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
-        enableSystem
+        defaultTheme="light"
         disableTransitionOnChange
       >
         <CurrencyProvider>

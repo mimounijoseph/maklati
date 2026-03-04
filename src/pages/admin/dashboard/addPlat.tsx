@@ -1,38 +1,38 @@
-import React, { FC, useState,useEffect } from "react";
-
+import React, { FC, useEffect, useMemo, useState } from "react";
+import { addDoc, collection, getDocs } from "firebase/firestore";
+import { ImagePlus, Link2, Plus, Trash2, UploadCloud } from "lucide-react";
 import Sidebar from "./sidebar";
-import { collection, addDoc,getDocs,doc } from "firebase/firestore";
-import { db, auth } from "../../../config/firebase"; 
-import ProtectedLayout from "@/guard/protectedPage";
+import { auth, db } from "../../../config/firebase";
 import { Plat } from "@/interfaces/product";
 import PexelsSearchModal from "@/components/pexelsSearch";
 import Spinner from "../../../components/spinner";
+import ProtectedLayout from "@/guard/adminProtectedPage";
+import { uploadImageFile } from "@/utils/uploadImage";
 
-type Category  = {
-  id:string,
-  name:string
-}
+type Category = {
+  id: string;
+  name: string;
+};
+
+const emptyForm = {
+  id: 0,
+  name: "",
+  description: "",
+  status: true,
+  category: "",
+  cost: [{ size: "", price: 0, quantity: 0 }],
+  urlPhoto: "",
+};
 
 const AddPlat: FC = () => {
-  // Updated form state
-  const [formData, setFormData] = useState<Omit<Plat, "userId" | "createdAt">>({
-    id: 0,
-    name: "",
-    description: "",
-    status: true,
-    category: "",
-    cost: [],
-    urlPhoto: "",
-  });
+  const [formData, setFormData] = useState<Omit<Plat, "snackId" | "createdAt">>(emptyForm);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
-
-  //useEffect used to fetch categories from firestore
-  useEffect(()=>{
-
-      const fetchCategories = async () => {
+  useEffect(() => {
+    const fetchCategories = async () => {
       const querySnapshot = await getDocs(collection(db, "categories"));
       const cats: Category[] = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -42,9 +42,16 @@ const AddPlat: FC = () => {
     };
 
     fetchCategories();
-  },[])
+  }, []);
 
-  // Add a new size-price row
+  const stats = useMemo(
+    () => ({
+      variants: formData.cost.length,
+      validVariants: formData.cost.filter((item) => item.size && item.price > 0).length,
+    }),
+    [formData.cost]
+  );
+
   const addCostRow = () => {
     setFormData((prev) => ({
       ...prev,
@@ -52,7 +59,6 @@ const AddPlat: FC = () => {
     }));
   };
 
-  // Update a specific size-price row
   const handleCostChange = (index: number, field: string, value: string | number) => {
     const updatedCost = [...formData.cost];
     updatedCost[index] = {
@@ -62,7 +68,6 @@ const AddPlat: FC = () => {
     setFormData((prev) => ({ ...prev, cost: updatedCost }));
   };
 
-  // Remove a row
   const removeCostRow = (index: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -70,210 +75,209 @@ const AddPlat: FC = () => {
     }));
   };
 
-  // Handle text input
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: name === "id" ? Number(value) || 0 : value,
     }));
   };
 
-  // Submit to Firestore
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingImage(true);
+      const url = await uploadImageFile(file, "plats");
+      setFormData((prev) => ({ ...prev, urlPhoto: url }));
+    } catch (error: any) {
+      console.error("Image upload failed:", error);
+      alert(error?.message || "Failed to upload image.");
+    } finally {
+      setUploadingImage(false);
+      event.target.value = "";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       setLoading(true);
-
       const user = auth.currentUser;
       if (!user) {
         alert("You must be logged in to add a plat.");
-        setLoading(false);
         return;
       }
 
       const newPlat = {
         ...formData,
-        snackId: user.uid, //todo replace userId by snackId
+        cost: formData.cost.filter((item) => item.size && item.price > 0),
+        snackId: user.uid,
         createdAt: new Date(),
       };
 
       await addDoc(collection(db, "plat"), newPlat);
-
-      setLoading(false);
       setShowPopup(true);
-
-      // Reset form
-      setFormData({
-        id: 0,
-        name: "",
-        description: "",
-        status: true,
-        category: "",
-        cost: [],
-        urlPhoto: "",
-      });
-
-      // Hide popup after 3s
+      setFormData(emptyForm);
       setTimeout(() => setShowPopup(false), 3000);
-
     } catch (error) {
       console.error("Error adding plat: ", error);
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-     
-    <div className="admin min-h-screen bg-gray-50" style={{ fontFamily: "Roboto, sans-serif" }}>
-      <Sidebar />
-      <div className="p-6 sm:ml-64">
-        <div className="mt-14">
-          {/* Page Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-gray-800">Add New Plat</h1>
-            <p className="text-gray-500 text-sm">Fill in the details below to create a new plat.</p>
-          </div>
-
-          {/* Form Container */}
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-8 max-w-4xl mx-auto relative"
-          >
-            {/* Basic Info */}
-            <div className="grid gap-6 md:grid-cols-2">
-              {/* Name */}
+    <ProtectedLayout>
+      <div className="admin min-h-screen bg-[radial-gradient(circle_at_top,rgba(251,146,60,0.12),transparent_32%),linear-gradient(180deg,#fff7ed_0%,#f8fafc_32%,#ffffff_100%)]">
+        <Sidebar />
+        <div className="p-5 sm:ml-64 sm:p-8">
+          <div className="mt-14">
+            <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">Title</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
-                  required
-                />
+                <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-orange-500">
+                  Add plat
+                </p>
+                <h1 className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-slate-950">
+                  Create a menu item
+                </h1>
+                <p className="mt-2 text-sm text-slate-500">
+                  Add strong visuals, clean pricing variants, and make the plat ready for orders.
+                </p>
               </div>
 
-              {/* Category */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Category
-                  </label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
-                    required
-                  >
-                    <option value="">Select category</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
+              <div className="grid grid-cols-2 gap-3 sm:w-auto">
+                <div className="rounded-3xl border border-white/70 bg-white/85 px-4 py-4 shadow-sm">
+                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">Variants</p>
+                  <p className="mt-2 text-2xl font-semibold text-slate-950">{stats.variants}</p>
+                </div>
+                <div className="rounded-3xl border border-white/70 bg-white/85 px-4 py-4 shadow-sm">
+                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">Ready</p>
+                  <p className="mt-2 text-2xl font-semibold text-slate-950">{stats.validVariants}</p>
+                </div>
+              </div>
+            </div>
+
+            <form
+              onSubmit={handleSubmit}
+              className="mx-auto max-w-6xl rounded-[32px] border border-white/70 bg-white/90 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6"
+            >
+              <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
+                <div className="min-w-0 space-y-6">
+                  <section className="rounded-[28px] border border-slate-200 bg-white p-5">
+                    <h2 className="text-lg font-semibold text-slate-950">Basic details</h2>
+                    <div className="mt-5 grid gap-5 md:grid-cols-2">
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">Title</label>
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none focus:border-orange-300" required />
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">Category</label>
+                        <select name="category" value={formData.category} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none focus:border-orange-300" required>
+                          <option value="">Select category</option>
+                          {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="mb-2 block text-sm font-medium text-slate-700">Description</label>
+                        <textarea name="description" value={formData.description} onChange={handleChange} rows={5} className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none focus:border-orange-300" required />
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="rounded-[28px] border border-slate-200 bg-white p-5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-lg font-semibold text-slate-950">Sizes and prices</h2>
+                        <p className="mt-1 text-sm text-slate-500">Add one or many variants for the same plat.</p>
+                      </div>
+                      <button type="button" onClick={addCostRow} className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:border-orange-200 hover:text-orange-600">
+                        <Plus className="h-4 w-4" />
+                        Add size
+                      </button>
+                    </div>
+
+                    <div className="mt-5 space-y-3">
+                      {formData.cost.map((c, index) => (
+                        <div key={index} className="grid gap-3 rounded-[24px] border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
+                          <input type="text" placeholder="Size" value={c.size} onChange={(e) => handleCostChange(index, "size", e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-orange-300" />
+                          <input type="number" placeholder="Price" value={c.price} onChange={(e) => handleCostChange(index, "price", e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-orange-300" />
+                          <input type="number" placeholder="Default quantity" value={c.quantity} onChange={(e) => handleCostChange(index, "quantity", e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-orange-300" />
+                          <button type="button" onClick={() => removeCostRow(index)} className="inline-flex h-12 w-full items-center justify-center rounded-2xl border border-rose-200 bg-white px-4 text-rose-600 hover:bg-rose-50 sm:col-span-2 xl:w-12 xl:px-0">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
                 </div>
 
-              {/* Description */}
-              <div className="md:col-span-2">
-                <label className="block mb-2 text-sm font-medium text-gray-700">Description</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows={4}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
-                  required
-                />
-              </div>
-            </div>
+                <div className="min-w-0 space-y-6">
+                  <section className="rounded-[28px] border border-slate-200 bg-white p-5">
+                    <h2 className="text-lg font-semibold text-slate-950">Product image</h2>
+                    <p className="mt-1 text-sm text-slate-500">Upload from your device, paste a link, or choose from Pexels.</p>
 
-            {/* Dynamic Sizes & Prices */}
-            <div>
-              <label className="block mb-3 text-sm font-medium text-gray-700">Sizes & Prices</label>
-              <div className="space-y-3 text-gray-900">
-                {formData.cost.map((c, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 bg-gray-50 border border-gray-200 p-3 rounded-xl"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Size (e.g. XL)"
-                      value={c.size}
-                      onChange={(e) => handleCostChange(index, "size", e.target.value)}
-                      className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Price"
-                      value={c.price}
-                      onChange={(e) => handleCostChange(index, "price", e.target.value)}
-                      className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeCostRow(index)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                    >
-                      ✕
+                    <div className="mt-5 space-y-4">
+                      <label className="flex cursor-pointer items-center justify-center gap-3 rounded-[24px] border border-dashed border-orange-200 bg-orange-50/60 px-4 py-5 text-sm font-medium text-orange-700 hover:bg-orange-50">
+                        <UploadCloud className="h-5 w-5" />
+                        {uploadingImage ? "Uploading image..." : "Upload from device"}
+                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                      </label>
+
+                      <div className="rounded-[24px] border border-slate-200 p-3">
+                        <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+                          <Link2 className="h-4 w-4" />
+                          Image URL
+                        </label>
+                        <input type="text" name="urlPhoto" value={formData.urlPhoto} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none focus:border-orange-300" placeholder="https://..." />
+                      </div>
+
+                      <div className="rounded-[24px] border border-slate-200 p-3">
+                        <PexelsSearchModal onSelect={(url) => setFormData({ ...formData, urlPhoto: url })} />
+                      </div>
+                    </div>
+
+                    <div className="mt-5 overflow-hidden rounded-[28px] border border-slate-200 bg-slate-50">
+                      {formData.urlPhoto ? (
+                        <img src={formData.urlPhoto} alt="Selected" className="h-56 w-full object-cover sm:h-72" />
+                      ) : (
+                        <div className="flex h-56 flex-col items-center justify-center gap-3 text-slate-400 sm:h-72">
+                          <ImagePlus className="h-10 w-10" />
+                          <p className="text-sm">Your plat preview will appear here</p>
+                        </div>
+                      )}
+                    </div>
+                  </section>
+
+                  <section className="rounded-[28px] border border-slate-200 bg-slate-950 p-5 text-white">
+                    <p className="text-xs uppercase tracking-[0.24em] text-white/45">Ready to publish</p>
+                    <p className="mt-3 text-sm leading-6 text-white/70">
+                      Save this plat to make it available in your snack menu. You can edit availability later from the product list.
+                    </p>
+                    <button type="submit" disabled={loading || uploadingImage} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:opacity-50">
+                      {loading && <Spinner />}
+                      Save plat
                     </button>
-                  </div>
-                ))}
+                  </section>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={addCostRow}
-                className="mt-3 text-blue-600 hover:underline text-sm font-medium"
-              >
-                + Add Size
-              </button>
-            </div>
 
-            {/* Photo Selector */}
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">Photo</label>
-              <PexelsSearchModal onSelect={(url) => setFormData({ ...formData, urlPhoto: url })} />
-              {formData.urlPhoto && (
-                <div className="mt-4">
-                  <img
-                    src={formData.urlPhoto}
-                    alt="Selected"
-                    className="h-48 rounded-xl shadow-md border border-gray-200"
-                  />
+              {showPopup && (
+                <div className="fixed bottom-6 right-6 rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-medium text-white shadow-lg">
+                  Plat added successfully.
                 </div>
               )}
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-xl shadow-md transition flex items-center gap-2"
-              >
-                {loading && <Spinner />}
-                Save Plat
-              </button>
-            </div>
-
-            {/* Popup Notification */}
-            {showPopup && (
-              <div className="absolute top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition">
-                Plat added successfully!
-              </div>
-            )}
-          </form>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
-   
+    </ProtectedLayout>
   );
 };
 

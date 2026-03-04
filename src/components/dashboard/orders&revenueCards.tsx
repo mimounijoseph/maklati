@@ -1,17 +1,31 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase";
 
-const RevenueOrdersCards = () => {
+type RevenueOrdersCardsProps = {
+  snackId?: string;
+};
+
+const RevenueOrdersCards = ({ snackId }: RevenueOrdersCardsProps) => {
   const [todayOrders, setTodayOrders] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [todayRevenue, setTodayRevenue] = useState(0);
   const [totalRevenue, setTotalRevenue] = useState(0);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "orders"), (querySnapshot) => {
+    if (!snackId) {
+      setTodayOrders(0);
+      setTotalOrders(0);
+      setTodayRevenue(0);
+      setTotalRevenue(0);
+      return;
+    }
+
+    const ordersQuery = query(collection(db, "orders"), where("snackId", "==", snackId));
+
+    const unsubscribe = onSnapshot(ordersQuery, (querySnapshot) => {
       let totalOrdersCount = 0;
       let totalRevenueSum = 0;
       let todayOrdersCount = 0;
@@ -52,7 +66,7 @@ const RevenueOrdersCards = () => {
 
     // Cleanup listener on unmount
     return () => unsubscribe();
-  }, []);
+  }, [snackId]);
 
   const cards = [
     { title: "Today Orders", value: todayOrders },

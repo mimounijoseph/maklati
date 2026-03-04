@@ -1,15 +1,21 @@
 "use client";
 
-import ThemeSwitchIcon from "@/components/theme-switch-icon";
-import React, { useEffect } from "react";
 import { useToast } from "@/components/ui/toast";
 import { useAuth } from "../../../context/useContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../config/firebase";
 import { useTranslation } from "react-i18next";
 import dynamic from "next/dynamic";
-import { Currency, useCurrency } from "@/context/currencyContext";
+import { useCurrency } from "@/context/currencyContext";
 import Select from "react-select";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+const LanguageSelect = dynamic(() => import("@/components/languag-select"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const options = [
   {
@@ -19,12 +25,12 @@ const options = [
   },
   {
     value: "EUR",
-    label: "EUR - €",
+    label: "EUR - EUR",
     flag: "https://flagcdn.com/eu.svg",
   },
   {
     value: "MAD",
-    label: "MAD - د.م",
+    label: "MAD - DH",
     flag: "https://flagcdn.com/ma.svg",
   },
 ];
@@ -32,8 +38,13 @@ const options = [
 function Header() {
   const { t, i18n } = useTranslation("common");
   const { toast } = useToast();
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { currency, setCurrency } = useCurrency();
+  const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement | null>(null);
+
   function showToast(
     title: string,
     message: string,
@@ -43,53 +54,220 @@ function Header() {
       title,
       description: message,
       variant,
-      duration: 2000
+      duration: 2000,
     });
   }
 
-const LanguageSelect = dynamic(
-  () => import("@/components/languag-select"),
-  { ssr: false, loading: () => null } 
-);
-
-
+  const navItems = useMemo(
+    () => [
+      { href: "/", label: "Home" },
+      { href: "/snack", label: t("snacks") },
+      { href: "/about", label: t("about") },
+      { href: "/contact", label: t("contact") },
+    ],
+    [t]
+  );
 
   const logout = async () => {
     await signOut(auth);
     showToast(t("logout_success_title"), t("logout_success_msg"), "success");
+    setProfileOpen(false);
+    router.push("/");
   };
 
   useEffect(() => {
     document.documentElement.dir = i18n.language === "ar" ? "rtl" : "ltr";
   }, [i18n.language]);
 
-  return (
-    <div>
-      <nav className="border-gray-200 bg-transparent">
-        <div className="flex flex-wrap items-center justify-between flex-shrink-0 max-w-screen-xl mx-auto p-4">
-          <a
-            href="/"
-            className="text-3xl font-bold"
-            style={{ color: "#FF9B00", fontFamily: "Sacramento" }}
-            aria-label={t("brand")}
-            title={t("brand")}
-            suppressHydrationWarning
-          >
-            {t("brand")}
-          </a>
+  useEffect(() => {
+    setMenuOpen(false);
+    setProfileOpen(false);
+  }, [router.asPath]);
 
-          <div className="flex items-center md:order-2 space-x-1 md:space-x-2 rtl:space-x-reverse">
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (!profileRef.current?.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const profileLabel = user?.displayName || user?.email || "Settings";
+
+  return (
+    <header className="sticky top-0 z-40 px-3 pt-3 sm:px-6">
+      <div className="mx-auto max-w-7xl overflow-visible rounded-[28px] border border-white/70 bg-white/78 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+        <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="text-2xl font-semibold tracking-[-0.06em] text-slate-950 sm:text-3xl"
+              style={{ fontFamily: "Fraunces, Georgia, serif" }}
+              aria-label={t("brand")}
+              title={t("brand")}
+              suppressHydrationWarning
+            >
+              {t("brand")}
+            </Link>
+
+            <nav className="hidden items-center gap-1 lg:flex">
+              {navItems.map((item) => {
+                const active = router.pathname === item.href;
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                      active
+                        ? "bg-orange-500 text-white shadow-[0_10px_25px_rgba(249,115,22,0.24)]"
+                        : "text-slate-600 hover:bg-orange-50 hover:text-orange-600"
+                    }`}
+                    suppressHydrationWarning
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="relative z-50 hidden lg:block" ref={profileRef}>
+              <button
+                type="button"
+                onClick={() => setProfileOpen((prev) => !prev)}
+                className="inline-flex items-center gap-3 rounded-full border border-orange-100 bg-white/90 px-3 py-2 text-sm text-slate-700 shadow-[0_12px_30px_rgba(15,23,42,0.06)] transition hover:border-orange-200 hover:bg-orange-50"
+                aria-expanded={profileOpen}
+                aria-label="Open account settings"
+              >
+                {user?.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="profile"
+                    className="h-9 w-9 rounded-full border border-orange-100 object-cover"
+                  />
+                ) : (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-sm font-semibold text-orange-600">
+                    {profileLabel.slice(0, 1).toUpperCase()}
+                  </div>
+                )}
+                <div className="hidden text-left xl:block">
+                  <p className="text-xs uppercase tracking-[0.22em] text-orange-500">
+                    Preferences
+                  </p>
+                  <p className="max-w-[160px] truncate text-sm font-medium text-slate-900">
+                    {profileLabel}
+                  </p>
+                </div>
+                <svg
+                  className={`h-4 w-4 text-slate-500 transition-transform ${profileOpen ? "rotate-180" : ""}`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+
+              {profileOpen && (
+                <div className="absolute right-0 top-full z-[90] mt-3 w-[320px] overflow-hidden rounded-[24px] border border-orange-100 bg-white/95 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl">
+                  <div className="rounded-[18px] bg-stone-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-orange-500">
+                      Account
+                    </p>
+                    <p className="mt-2 text-sm font-semibold text-slate-900">{profileLabel}</p>
+                    {user?.email && (
+                      <p className="mt-1 text-xs text-slate-500">{user.email}</p>
+                    )}
+                  </div>
+
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
+                        Language
+                      </p>
+                      <LanguageSelect />
+                    </div>
+
+                    <div>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
+                        Currency
+                      </p>
+                      <Select
+                        value={options.find((o) => o.value === currency)}
+                        onChange={(opt: any) => setCurrency(opt?.value)}
+                        options={options}
+                        isSearchable={false}
+                        formatOptionLabel={(option: any) => (
+                          <div className="flex items-center gap-2 text-slate-900">
+                            <img src={option.flag} alt={option.value} className="h-4 w-5 rounded-sm object-cover" />
+                            <span className="text-sm">{option.label}</span>
+                          </div>
+                        )}
+                        styles={{
+                          control: (base: any, state: any) => ({
+                            ...base,
+                            minHeight: 44,
+                            borderRadius: 18,
+                            borderColor: state.isFocused ? "#fb923c" : "#fed7aa",
+                            boxShadow: "none",
+                            backgroundColor: "rgba(255,255,255,0.96)",
+                          }),
+                          menu: (base: any) => ({
+                            ...base,
+                            borderRadius: 18,
+                            overflow: "hidden",
+                          }),
+                        }}
+                      />
+                    </div>
+
+                    {user ? (
+                      <button
+                        type="button"
+                        onClick={logout}
+                        className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-500"
+                        suppressHydrationWarning
+                      >
+                        {t("logout")}
+                      </button>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        <Link
+                          href="/auth/login"
+                          className="rounded-2xl bg-stone-100 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-orange-600"
+                          suppressHydrationWarning
+                        >
+                          {t("login")}
+                        </Link>
+                        <Link
+                          href="/auth/register"
+                          className="rounded-2xl bg-orange-500 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-orange-600"
+                          suppressHydrationWarning
+                        >
+                          {t("signup")}
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <button
-              data-collapse-toggle="mega-menu"
               type="button"
-              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg md:hidden hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-600"
-              aria-controls="mega-menu"
-              aria-expanded="false"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-orange-100 bg-orange-50 text-orange-600 transition hover:bg-orange-100 lg:hidden"
+              onClick={() => setMenuOpen((prev) => !prev)}
               aria-label="Open main menu"
             >
-              <span className="sr-only">Open main menu</span>
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -105,130 +283,121 @@ const LanguageSelect = dynamic(
               </svg>
             </button>
           </div>
+        </div>
 
-          <div
-            id="mega-menu"
-            className="items-center hidden w-full md:flex md:w-auto md:order-2"
-          >
-            <ul className="flex flex-col md:items-center mt-4 font-medium md:flex-row md:mt-0 md:space-x-8 rtl:space-x-reverse">
-              <li>
-                <a
-                  href="/"
-                  className="block py-2 px-3 text-white border-b border-gray-100 hover:text-amber-600 md:border-0 md:p-0"
-                  aria-current="page"
-                  suppressHydrationWarning
-                >
-                  {t("menu")}
-                </a>
-              </li>
+        {menuOpen && (
+          <div className="border-t border-orange-100/70 bg-white/88 px-4 py-4 lg:hidden">
+            <div className="flex flex-col gap-2">
+              {navItems.map((item) => {
+                const active = router.pathname === item.href;
 
-              <li>
-                <a
-                  href="/snack"
-                  className="block py-2 px-3 text-white border-b border-gray-100 hover:text-amber-600 md:border-0 md:p-0"
-                  suppressHydrationWarning
-                >
-                  {t("snacks")}
-                </a>
-              </li>
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${
+                      active
+                        ? "bg-orange-500 text-white"
+                        : "bg-stone-50 text-slate-700 hover:bg-orange-50 hover:text-orange-600"
+                    }`}
+                    suppressHydrationWarning
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
 
-              <li>
-                <a
-                  href="/about"
-                  className="block py-2 px-3 text-white border-b border-gray-100 hover:text-amber-600 md:border-0 md:p-0"
-                  suppressHydrationWarning
-                >
-                  {t("about")}
-                </a>
-              </li>
+            <div className="mt-4 rounded-[24px] border border-orange-100 bg-white/90 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
+              <div className="flex items-center gap-3">
+                {user?.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="profile"
+                    className="h-10 w-10 rounded-full border border-orange-100 object-cover"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-sm font-semibold text-orange-600">
+                    {profileLabel.slice(0, 1).toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs uppercase tracking-[0.22em] text-orange-500">
+                    Preferences
+                  </p>
+                  <p className="text-sm font-medium text-slate-900">{profileLabel}</p>
+                </div>
+              </div>
 
-              <li>
-                <a
-                  href="/contact"
-                  className="block py-2 px-3 text-white border-b border-gray-100 hover:text-amber-600 md:border-0 md:p-0"
-                  suppressHydrationWarning
-                >
-                  {t("contact")}
-                </a>
-              </li>
+              <div className="mt-4 grid gap-3">
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
+                    Language
+                  </p>
+                  <LanguageSelect />
+                </div>
 
-              {user ? (
-                <>
-                  <li className="text-center mt-10 mb-5 md:ms-24 md:mb-0 md:mt-0">
-                    <a
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
+                    Currency
+                  </p>
+                  <Select
+                    value={options.find((o) => o.value === currency)}
+                    onChange={(opt: any) => setCurrency(opt?.value)}
+                    options={options}
+                    isSearchable={false}
+                    formatOptionLabel={(option: any) => (
+                      <div className="flex items-center gap-2 text-slate-900">
+                        <img src={option.flag} alt={option.value} className="h-4 w-5 rounded-sm object-cover" />
+                        <span className="text-sm">{option.label}</span>
+                      </div>
+                    )}
+                    styles={{
+                      control: (base: any) => ({
+                        ...base,
+                        minHeight: 46,
+                        borderRadius: 18,
+                        borderColor: "#fed7aa",
+                        boxShadow: "none",
+                      }),
+                    }}
+                  />
+                </div>
+
+                {user ? (
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white"
+                    suppressHydrationWarning
+                  >
+                    {t("logout")}
+                  </button>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link
                       href="/auth/login"
-                      className="text-white bg-amber-600 md:bg-transparent hover:bg-amber-600 focus:ring-4 font-medium rounded-lg text-sm px-14 py-2 md:px-5 md:py-2.5 focus:outline-none"
-                      onClick={logout}
-                      suppressHydrationWarning
-                    >
-                      {t("logout")}
-                    </a>
-                  </li>
-                  <li>
-                    <div className="flex justify-center gap-2 items-center w-fit m-auto md:mt-2">
-                      <p className="font-normal text-sm text-amber-600">
-                        {user.displayName}
-                      </p>
-                      <img
-                        src={user?.photoURL as string}
-                        alt="profile"
-                        className="w-10 h-10 rounded-full mx-auto"
-                      />
-                    </div>
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li className="md:ms-24">
-                    <a
-                      href="/auth/login"
-                      className="text-white hover:bg-amber-600 focus:ring-4 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 focus:outline-none"
+                      className="rounded-2xl bg-stone-100 px-4 py-3 text-center text-sm font-semibold text-slate-700"
                       suppressHydrationWarning
                     >
                       {t("login")}
-                    </a>
-                  </li>
-                  <li>
-                    <a
+                    </Link>
+                    <Link
                       href="/auth/register"
-                      className="text-white hover:bg-amber-600 focus:ring-4 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 focus:outline-none"
+                      className="rounded-2xl bg-orange-500 px-4 py-3 text-center text-sm font-semibold text-white"
                       suppressHydrationWarning
                     >
                       {t("signup")}
-                    </a>
-                  </li>
-                </>
-              )}
-              <LanguageSelect />
-<li>
-<Select
-      value={options.find((o) => o.value === currency)}
-      onChange={(opt:any) => setCurrency(opt?.value)}
-      options={options}
-      formatOptionLabel={(option:any) => (
-        <div className="flex items-center gap-2 text-black" style={{fontFamily: 'sans-serif'}}>
-          <img src={option.flag} alt={option.value} className="w-5 h-4 rounded-sm" />
-          <span>{option.label}</span>
-        </div>
-      )}
-      className="w-44"
-      styles={{
-        control: (base:any) => ({
-          ...base,
-          borderRadius: "0.5rem",
-          padding: "2px",
-          color:'black'
-        }),
-      }}
-    />
-</li>
-            </ul>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </nav>
-    </div>
+        )}
+      </div>
+    </header>
   );
 }
-
 
 export default Header;

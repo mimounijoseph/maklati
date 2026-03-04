@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "./card";
-import { useAuth } from "@/context/useContext";
-// import { Category } from "@/enums/category";
 import { ProductService } from "@/services/product";
-
 import { CategoryService } from "@/services/CategoryService";
+import { useTranslation } from "react-i18next";
+import CustomerCartDrawer from "./customerCartDrawer";
 
 export type Product = {
   id: number;
@@ -20,8 +19,6 @@ export type Product = {
     quantity: number;
   }[];
 };
-
-import { useTranslation } from "react-i18next";
 
 export type Category = {
   id: string;
@@ -43,29 +40,34 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
   const [loading, setLoading] = useState(true);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-
-  const { selectedProducts } = useAuth();
   const categoryService = new CategoryService();
 
   const updateProductsDisplay = () => {
-    const data = products.filter((p: any) => p?.category === selectedCategory);
+    const data =
+      selectedCategory === ""
+        ? products
+        : products.filter((p: any) => p?.category === selectedCategory);
     setFilteredProducts(data);
   };
 
   const fetchProducts = async () => {
+    if (!snackId) {
+      setProducts([]);
+      setLoading(false);
+      return;
+    }
+
     const response = await productService.getBySnackId(snackId);
-    setProducts(response!);
+    setProducts(response || []);
     setLoading(false);
   };
 
   async function fetchCategories() {
     const data = await categoryService.getAll();
-
-    // Ensure each category has an icon, and fix type compatibility
     const formatted = data.map((cat: any) => ({
       id: cat.id,
       name: cat.name,
-      icon: cat.icon || "🍽️", // fallback icon
+      icon: cat.icon || "🍽️",
     }));
 
     setCategories(formatted);
@@ -74,101 +76,93 @@ export const ProductSelection = ({ next, snackId }: ProductSelectionProps) => {
   useEffect(() => {
     fetchProducts();
     fetchCategories();
-  }, []);
+  }, [snackId]);
 
   useEffect(() => {
     updateProductsDisplay();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory, loading, products]);
+  }, [selectedCategory, products]);
 
   return (
-    <div>
-      <div className="text-white p-2 ">
-        <header className="text-center mb-10">
-          <h1
-            className="text-5xl text-red-500 hidden
-               font-bold mb-2 "
-          >
-            Menu
-          </h1>
-        </header>
-
-        {/* Categories Section */}
-        {/* <h2 className="text-gray-800" style={{ fontFamily: "Inter, sans-serif" }}>Menu categories</h2> */}
-        <div>
-          <img
-            src="/plat.png"
-            alt="add plat icon"
-            width={"40px"}
-            className="float-right cursor-pointer"
-            onClick={next}
-          />
-          <h1 className="text-black text-2xl text-center mb-5 font-semibold ps-3">Order now</h1>
-        </div>
-        <div className="flex justify-center gap-3 mb-4   py-4 ">
-          <div className="flex justify-center w-full max-w-[450px] sm:max-w-full px-4  ">
-            <ul className="flex overflow-x-auto no-scrollbar text-xs font-medium text-gray-600 dark:text-black space-x-4  py-2">
-              {categories.map((cat) => {
-                // truncate long category names
-                const displayName =
-                  cat.name.length > 10
-                    ? cat.name.slice(0, 8) + "..."
-                    : cat.name;
-
-                return (
-                  <li
-                    key={cat.id}
-                    className="flex-shrink-0 w-[70px] flex flex-col items-center cursor-pointer"
-                    onClick={() => setSelectedCategory(cat.id)}
-                  >
-                    {/* Circle with Icon */}
-                    <div
-                      className={`w-14 h-14 flex items-center justify-center rounded-full shadow-md transition-all duration-200 ${
-                        selectedCategory === cat.id
-                          ? ""
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                      }`}
-                    >
-                      <span className="text-2xl">{cat.icon || "🍽️"}</span>
-                    </div>
-
-                    {/* Category Name */}
-                    <p
-                      className={`mt-2 text-center text-xs  ${
-                        selectedCategory === cat.id
-                          ? "text-amber-600"
-                          : "text-gray-600"
-                      }`}
-                      style={{ fontFamily: "Inter, sans-serif" }}
-                    >
-                      {displayName}
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
+    <div className="px-4 pb-10 pt-4 sm:px-6">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-orange-500">
+              Menu
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-slate-950">
+              Order from the menu
+            </h1>
           </div>
+
+          <CustomerCartDrawer
+            orderOwnerId={snackId}
+            onReview={next}
+            reviewLabel="Review and confirm"
+          />
         </div>
 
-        {/* the section below is displaying the selected category plats */}
-      </div>
-      <div className="flex gap-2 justify-center items-start flex-wrap h-screen ">
-        {filteredProducts.map((product, index) => (
-          <Card key={product.id} isOrderForm={true} product={product} />
-        ))}
-      </div>
+        <div className="overflow-hidden rounded-[28px] border border-orange-100/70 bg-white/85 p-3 shadow-[0_24px_70px_rgba(148,163,184,0.14)] backdrop-blur">
+          <ul className="flex gap-3 overflow-x-auto no-scrollbar px-1 py-1">
+            <li className="flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setSelectedCategory("")}
+                className={`inline-flex min-w-[110px] items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
+                  selectedCategory === ""
+                    ? "bg-slate-950 text-white shadow-[0_12px_28px_rgba(15,23,42,0.18)]"
+                    : "bg-stone-100 text-slate-600 hover:bg-orange-50 hover:text-orange-600"
+                }`}
+              >
+                <span className="text-base">✦</span>
+                All
+              </button>
+            </li>
 
-      {/* <button
-        onClick={next}
-        className="bg-red-500 text-white px-4 py-2 rounded block m-auto mt-10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={selectedProducts.length === 0}
-        aria-disabled={selectedProducts.length === 0}
-        title={
-          selectedProducts.length === 0 ? t("checkout.select_one_hint") : ""
-        }
-      >
-        {t("checkout.validate_products")}
-      </button> */}
+            {categories.map((cat) => {
+              const displayName =
+                cat.name.length > 12 ? `${cat.name.slice(0, 10)}...` : cat.name;
+              const active = selectedCategory === cat.id;
+
+              return (
+                <li key={cat.id} className="flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`inline-flex min-w-[130px] items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
+                      active
+                        ? "bg-orange-500 text-white shadow-[0_12px_28px_rgba(249,115,22,0.28)]"
+                        : "bg-stone-100 text-slate-600 hover:bg-orange-50 hover:text-orange-600"
+                    }`}
+                  >
+                    <span className="text-lg">{cat.icon || "🍽️"}</span>
+                    <span>{displayName}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div className="mt-8">
+          {loading ? (
+            <div className="rounded-[28px] border border-dashed border-orange-200 bg-white/75 px-6 py-14 text-center text-sm text-slate-500">
+              {t("products.loading")}
+            </div>
+          ) : filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+              {filteredProducts.map((product) => (
+                <Card key={product.id} isOrderForm={true} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[28px] border border-dashed border-orange-200 bg-white/75 px-6 py-14 text-center text-sm text-slate-500">
+              {t("products.empty")}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

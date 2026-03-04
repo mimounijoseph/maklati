@@ -1,15 +1,26 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { Bell } from "lucide-react";
+
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Bell, CheckCheck } from "lucide-react";
+import {
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  updateDoc,
+  where,
+  writeBatch,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { useAuth } from "@/context/useContext";
 
 type Notification = {
+  id: string;
   orderId: string;
   restaurantId: string;
   title: string;
   message: string;
-  createdAt: any;
+  createdAt: Date;
   read: boolean;
   type: string;
 };
@@ -19,52 +30,66 @@ type NotificationDropdownProps = {
 };
 
 const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder }) => {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const isInitialLoad = useRef(true); // 🔑 track initial snapshot
+  const isInitialLoad = useRef(true);
+  const onNewOrderRef = useRef(onNewOrder);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"));
+    onNewOrderRef.current = onNewOrder;
+  }, [onNewOrder]);
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          const newNotif = {
-            ...change.doc.data(),
-            createdAt: change.doc.data().createdAt?.toDate
-              ? change.doc.data().createdAt.toDate()
-              : new Date(),
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      setNotifications([]);
+      isInitialLoad.current = true;
+      return;
+    }
+
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("restaurantId", "==", user.uid)
+    );
+
+    const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
+      const nextNotifications = snapshot.docs
+        .map((docSnap) => {
+          const raw = docSnap.data();
+          return {
+            id: docSnap.id,
+            ...(raw as Omit<Notification, "id" | "createdAt">),
+            createdAt: raw.createdAt?.toDate ? raw.createdAt.toDate() : new Date(),
           } as Notification;
+        })
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-          if (!isInitialLoad.current && newNotif.type === "order") {
-            const audio = new Audio("/sounds/cashier.mp3");
-            audio.play().catch((err) => console.error("Sound error:", err));
+      setNotifications(nextNotifications);
 
-            onNewOrder?.(newNotif.message);
-          }
+      snapshot.docChanges().forEach((change) => {
+        const raw = change.doc.data();
+        const current: Notification = {
+          id: change.doc.id,
+          ...(raw as Omit<Notification, "id" | "createdAt">),
+          createdAt: raw.createdAt?.toDate ? raw.createdAt.toDate() : new Date(),
+        };
 
-          setNotifications((prev) => [newNotif, ...prev]);
-        }
-
-        if (change.type === "modified") {
-          setNotifications((prev) =>
-            prev.map((n) =>
-              n.orderId === change.doc.data().orderId
-                ? {
-                    ...change.doc.data(),
-                    createdAt: change.doc.data().createdAt?.toDate
-                      ? change.doc.data().createdAt.toDate()
-                      : new Date(),
-                  } as Notification
-                : n
-            )
-          );
-        }
-
-        if (change.type === "removed") {
-          setNotifications((prev) =>
-            prev.filter((n) => n.orderId !== change.doc.data().orderId)
-          );
+        if (change.type === "added" && !isInitialLoad.current && current.type === "order") {
+          const audio = new Audio("/sounds/cashier.mp3");
+          audio.play().catch((err) => console.error("Sound error:", err));
+          onNewOrderRef.current?.(current.message);
         }
       });
 
@@ -74,61 +99,114 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [user?.uid]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  const markAsRead = async (id: string) => {
+    try {
+      await updateDoc(doc(db, "notifications", id), { read: true });
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const unreadNotifications = notifications.filter((item) => !item.read);
+      if (unreadNotifications.length === 0) return;
+
+      const batch = writeBatch(db);
+      unreadNotifications.forEach((item) => {
+        batch.update(doc(db, "notifications", item.id), { read: true });
+      });
+      await batch.commit();
+    } catch (error) {
+      console.error("Failed to mark all notifications as read:", error);
+    }
+  };
+
+  const groupedLabel = useMemo(() => {
+    if (unreadCount === 0) return "All caught up";
+    if (unreadCount === 1) return "1 unread alert";
+    return `${unreadCount} unread alerts`;
+  }, [unreadCount]);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <button
-        onClick={() => setOpen(!open)}
-        className="relative inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-950 focus:outline-none"
+        onClick={() => setOpen((prev) => !prev)}
+        className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-orange-200 hover:text-orange-600"
       >
-        <Bell className="w-7 h-7" />
+        <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <div className="absolute -top-0.5 left-3 bg-red-600 border-2 border-white rounded-full flex items-center justify-center min-w-[20px] h-[20px] px-1">
-            <p className="text-white text-xs  leading-none">{unreadCount}</p>
-          </div>
+          <span className="absolute -right-1 -top-1 inline-flex min-w-[20px] items-center justify-center rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-semibold text-white ring-2 ring-white">
+            {unreadCount}
+          </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 z-20 w-80 max-w-sm bg-white divide-y divide-gray-100 rounded-lg shadow-lg">
-          <div className="block px-4 py-2 font-medium text-center text-gray-900 rounded-t-lg bg-gray-50">
-            Notifications
-          </div>
-          <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
-            {notifications.length === 0 && (
-              <div className="px-4 py-3 text-gray-500 text-sm text-center">
-                No notifications
+        <div className="absolute right-0 z-30 mt-3 w-[360px] overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.14)]">
+          <div className="border-b border-slate-100 bg-slate-50/80 px-4 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-950">Notifications</p>
+                <p className="mt-1 text-xs text-slate-500">{groupedLabel}</p>
               </div>
-            )}
+              <button
+                onClick={markAllAsRead}
+                disabled={unreadCount === 0}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-orange-200 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <CheckCheck className="h-3.5 w-3.5" />
+                Mark all read
+              </button>
+            </div>
+          </div>
 
-            {notifications.map((notif, index) => (
-              <div key={index} className="flex px-4 py-3 hover:bg-gray-100">
-                {/* <div className="shrink-0 relative">
-                  <img
-                    className="rounded-full w-11 h-11"
-                    src="https://randomuser.me/api/portraits/lego/1.jpg"
-                    alt="profile"
-                  />
-                </div> */}
-                <div className="w-full ps-3">
-                  <div className="text-gray-500 text-sm mb-1.5">{notif.message}</div>
-                  <div className="text-xs text-blue-600">
-                    {notif.createdAt.toLocaleString()}
+          <div className="max-h-[380px] overflow-y-auto">
+            {notifications.length === 0 ? (
+              <div className="px-6 py-12 text-center text-sm text-slate-500">
+                No notifications yet.
+              </div>
+            ) : (
+              notifications.map((notif) => (
+                <div
+                  key={notif.id}
+                  className={`border-b border-slate-100 px-4 py-4 transition hover:bg-slate-50 ${
+                    notif.read ? "bg-white" : "bg-orange-50/40"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="truncate text-sm font-semibold text-slate-950">
+                          {notif.title || "Notification"}
+                        </p>
+                        {!notif.read && (
+                          <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
+                        )}
+                      </div>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">{notif.message}</p>
+                      <p className="mt-2 text-xs text-slate-400">
+                        {notif.createdAt.toLocaleString()}
+                      </p>
+                    </div>
+
+                    {!notif.read && (
+                      <button
+                        onClick={() => markAsRead(notif.id)}
+                        className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-orange-200 hover:text-orange-600"
+                      >
+                        Read
+                      </button>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
-          <a
-            href="#"
-            className="block py-2 text-sm font-medium text-center text-gray-900 rounded-b-lg bg-gray-50 hover:bg-gray-100"
-          >
-        
-            View all
-          </a>
         </div>
       )}
     </div>

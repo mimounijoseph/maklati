@@ -29,8 +29,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <ToastProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
-        enableSystem
+        defaultTheme="light"
         disableTransitionOnChange
       >
         <CurrencyProvider>

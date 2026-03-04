@@ -5,15 +5,15 @@ import QRCode from "react-qr-code";
 import { toPng } from "html-to-image";
 
 interface QrCodeGeneratorProps {
-  menuId: string;
+  snackId: string;
 }
 
-const QrCodeGenerator: React.FC<QrCodeGeneratorProps> = ({ menuId = "1" }) => {
+const QrCodeGenerator: React.FC<QrCodeGeneratorProps> = ({ snackId }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const url = `${
     typeof window !== "undefined" ? window.location.origin : ""
-  }/menu/${menuId}`;
+  }/client/order/${snackId}`;
 
   const downloadImage = async () => {
     if (ref.current === null) return;
@@ -30,7 +30,7 @@ const QrCodeGenerator: React.FC<QrCodeGeneratorProps> = ({ menuId = "1" }) => {
       });
 
       const link = document.createElement("a");
-      link.download = `menu-${menuId}-qrcode.png`;
+      link.download = `snack-${snackId}-qrcode.png`;
       link.href = dataUrl;
       link.click();
     } catch (error) {

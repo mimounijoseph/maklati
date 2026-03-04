@@ -3,12 +3,12 @@ import {
   addDoc,
   collection,
   getDocs,
-  limit,
-  orderBy,
+  doc,
+  getDoc,
   query,
   where,
 } from "firebase/firestore";
-import { db, auth } from "../config/firebase";
+import { db } from "../config/firebase";
 export class SnackService {
   constructor() {}
 
@@ -48,13 +48,34 @@ export class SnackService {
   async getByOwnerId(ownerId: any) {
     try {
       const snackRef = collection(db, "snacks");
-      const q = query(snackRef, where("userUID", "==", ownerId));
+      const q = query(snackRef, where("ownerUID", "==", ownerId));
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
-        return querySnapshot.docs[0].data();
+        const firstDoc = querySnapshot.docs[0];
+        return {
+          id: firstDoc.id,
+          ...firstDoc.data(),
+        };
       }
     } catch (error) {
       console.error("Error finding snack: ", error);
+    }
+  }
+
+  async getById(snackId: string) {
+    try {
+      const snackDoc = await getDoc(doc(db, "snacks", snackId));
+      if (!snackDoc.exists()) {
+        return null;
+      }
+
+      return {
+        id: snackDoc.id,
+        ...snackDoc.data(),
+      };
+    } catch (error) {
+      console.error("Error finding snack by id: ", error);
+      return null;
     }
   }
 }
