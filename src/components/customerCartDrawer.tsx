@@ -22,6 +22,15 @@ type OrderHistoryItem = {
   snackId?: string;
 };
 
+type CartItem = {
+  id: string;
+  name: string;
+  size: string;
+  quantity: number;
+  price: number;
+  lineTotal: number;
+};
+
 const toTimestamp = (value: any) => {
   if (value?.toDate) return value.toDate().getTime();
   if (value?.seconds) return value.seconds * 1000;
@@ -41,7 +50,7 @@ export default function CustomerCartDrawer({
   const [mounted, setMounted] = useState(false);
 
   const cartItems = useMemo(
-    () =>
+    (): CartItem[] =>
       selectedProducts.flatMap((product: any) =>
         (product?.cost || [])
           .filter((cost: any) => cost.quantity > 0)
@@ -58,12 +67,12 @@ export default function CustomerCartDrawer({
   );
 
   const cartCount = useMemo(
-    () => cartItems.reduce((sum: number, item: any) => sum + item.quantity, 0),
+    () => cartItems.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
     [cartItems]
   );
 
   const cartTotal = useMemo(
-    () => cartItems.reduce((sum: number, item: any) => sum + item.lineTotal, 0),
+    () => cartItems.reduce((sum: number, item: CartItem) => sum + item.lineTotal, 0),
     [cartItems]
   );
 
