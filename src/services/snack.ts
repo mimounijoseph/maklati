@@ -12,7 +12,7 @@ import { db } from "../config/firebase";
 export class SnackService {
   constructor() {}
 
-  async getAll() {
+  async getAll(): Promise<(Snack & { id: string })[]> {
     try {
       const snackRef = collection(db, "snacks");
       const querySnapshot = await getDocs(snackRef);
@@ -45,7 +45,7 @@ export class SnackService {
     }
   }
 
-  async getByOwnerId(ownerId: any) {
+  async getByOwnerId(ownerId: string): Promise<(Snack & { id: string }) | null> {
     try {
       const snackRef = collection(db, "snacks");
       const q = query(snackRef, where("ownerUID", "==", ownerId));
@@ -54,15 +54,17 @@ export class SnackService {
         const firstDoc = querySnapshot.docs[0];
         return {
           id: firstDoc.id,
-          ...firstDoc.data(),
+          ...(firstDoc.data() as Snack),
         };
       }
+      return null;
     } catch (error) {
       console.error("Error finding snack: ", error);
+      return null;
     }
   }
 
-  async getById(snackId: string) {
+  async getById(snackId: string): Promise<(Snack & { id: string }) | null> {
     try {
       const snackDoc = await getDoc(doc(db, "snacks", snackId));
       if (!snackDoc.exists()) {
@@ -71,7 +73,7 @@ export class SnackService {
 
       return {
         id: snackDoc.id,
-        ...snackDoc.data(),
+        ...(snackDoc.data() as Snack),
       };
     } catch (error) {
       console.error("Error finding snack by id: ", error);
