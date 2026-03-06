@@ -83,6 +83,7 @@ const Sidebar: FC = () => {
   const [accountOpen, setAccountOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const alertTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const accountRef = useRef<HTMLDivElement | null>(null);
 
@@ -134,6 +135,7 @@ const Sidebar: FC = () => {
 
     const handleRouteDone = () => {
       setIsNavigating(false);
+      setSidebarOpen(false);
     };
 
     router.events.on("routeChangeStart", handleRouteStart);
@@ -176,15 +178,15 @@ const Sidebar: FC = () => {
   return (
     <div className="admin" style={{ fontFamily: "sans-serif" }}>
       <nav className="fixed top-0 z-50 w-full border-b border-gray-200 bg-white/90 backdrop-blur-md dark:border-gray-700 dark:bg-gray-800/90">
-        <div className="px-3 py-3 lg:px-5 lg:pl-3">
-          <div className="flex items-center justify-between">
+        <div className="h-14 px-3 lg:px-5 lg:pl-3">
+          <div className="flex h-full items-center justify-between">
             <div className="flex items-center justify-start rtl:justify-end">
               <button
-                data-drawer-target="logo-sidebar"
-                data-drawer-toggle="logo-sidebar"
                 aria-controls="logo-sidebar"
                 type="button"
-                className="inline-flex items-center rounded-lg p-2 text-sm text-gray-500 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 sm:hidden dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                onClick={() => setSidebarOpen((prev) => !prev)}
+                aria-expanded={sidebarOpen}
+                className="inline-flex items-center rounded-lg p-2 text-sm text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 sm:hidden dark:text-gray-200 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
               >
                 <span className="sr-only">Open sidebar</span>
                 <svg className="h-6 w-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -301,12 +303,36 @@ const Sidebar: FC = () => {
         )}
       </nav>
 
+      {sidebarOpen && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-30 bg-black/40 sm:hidden"
+        />
+      )}
+
       <aside
         id="logo-sidebar"
-        className="fixed left-0 top-0 z-40 h-screen w-64 -translate-x-full border-r border-gray-200 bg-white/95 pt-20 transition-transform sm:translate-x-0 dark:border-gray-700 dark:bg-gray-800/95"
+        className={`fixed left-0 top-14 z-40 h-[calc(100vh-3.5rem)] w-64 border-r border-gray-200 bg-white/95 pt-3 transition-transform dark:border-gray-700 dark:bg-gray-800/95 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } sm:translate-x-0`}
         aria-label="Sidebar"
       >
         <div className="h-full overflow-y-auto bg-white/80 px-3 pb-4 backdrop-blur-sm dark:bg-gray-800/80">
+          <div className="mb-2 flex items-center justify-end sm:hidden">
+            <button
+              type="button"
+              aria-label="Close sidebar"
+              onClick={() => setSidebarOpen(false)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-stone-100 text-slate-700 transition hover:bg-stone-200"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </button>
+          </div>
           <ul className="space-y-2" style={{ fontFamily: "sans-serif" }}>
             {navLinks.map((item) => {
               const isActive = pathname === item.href;
@@ -319,6 +345,7 @@ const Sidebar: FC = () => {
                   <Link
                     href={item.href}
                     scroll={false}
+                    onClick={() => setSidebarOpen(false)}
                     className={`group flex items-center rounded-lg p-2 transition-all duration-200 ${
                       isActive
                         ? "bg-orange-50 text-orange-500 shadow-sm"
