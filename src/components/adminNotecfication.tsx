@@ -147,10 +147,10 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
       </button>
 
       {open && (
-        <div className="absolute right-0 z-30 mt-3 w-[360px] overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.14)]">
+        <div className="fixed left-1/2 top-[84px] z-[90] w-[calc(100vw-1.5rem)] max-w-sm -translate-x-1/2 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.14)] sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-[360px] sm:max-w-[92vw] sm:translate-x-0">
           <div className="border-b border-slate-100 bg-slate-50/80 px-4 py-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-950">Notifications</p>
                 <p className="mt-1 text-xs text-slate-500">{groupedLabel}</p>
               </div>
@@ -165,7 +165,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
             </div>
           </div>
 
-          <div className="max-h-[380px] overflow-y-auto">
+          <div className="max-h-[70vh] overflow-y-auto sm:max-h-[380px]">
             {notifications.length === 0 ? (
               <div className="px-6 py-12 text-center text-sm text-slate-500">
                 No notifications yet.
@@ -178,7 +178,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
                     notif.read ? "bg-white" : "bg-orange-50/40"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="truncate text-sm font-semibold text-slate-950">
@@ -197,7 +197,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNewOrder 
                     {!notif.read && (
                       <button
                         onClick={() => markAsRead(notif.id)}
-                        className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-orange-200 hover:text-orange-600"
+                        className="self-start rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-orange-200 hover:text-orange-600"
                       >
                         Read
                       </button>
